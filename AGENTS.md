@@ -18,6 +18,7 @@ If conflicts occur:
 PRD.md takes priority for functionality.
 Stitch Export takes priority for visual design.
 
+
 ## 🛑 STITCH MCP (MODEL CONTEXT PROTOCOL) ENFORCEMENT
 - **Ground Truth Source:** The directory `stitch_export/` is the absolute ground-truth design schema.
 - **No UI Hallucination:** You are strictly forbidden from inventing new layout wrappers, altering color palettes, or generating bootstrap/generic UI structures.
