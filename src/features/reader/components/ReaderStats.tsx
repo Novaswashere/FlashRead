@@ -8,17 +8,17 @@ export interface ReaderStatsProps {
 
 export const ReaderStats: React.FC<ReaderStatsProps> = ({
   wordsRead,
-  totalWords,
-  currentWPM
+  totalWords
 }) => {
+  const formattedWords = wordsRead >= 1000 ? `${(wordsRead / 1000).toFixed(1)}k` : wordsRead;
+
   return (
-    <div className="flex items-center justify-between text-xs font-label-mono text-outline select-none mt-2">
-      <div>
-        WORDS: <span className="font-bold text-on-surface">{wordsRead}</span> / {totalWords}
-      </div>
-      <div>
-        SPEED: <span className="font-bold text-primary">{currentWPM} WPM</span>
-      </div>
+    <div className="flex flex-col items-end px-3 select-none text-right">
+      <span className="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-wider">Progress</span>
+      <span className="font-label-mono text-lg text-on-surface font-semibold">
+        {formattedWords}
+        <span className="text-[10px] text-on-surface-variant font-normal ml-1">words</span>
+      </span>
     </div>
   );
 };

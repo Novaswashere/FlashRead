@@ -17,7 +17,7 @@ export const ReaderControls: React.FC<ReaderControlsProps> = ({
     <div className="flex items-center justify-center gap-space-lg my-space-md">
       <button
         onClick={onSkipBack}
-        className="material-symbols-outlined text-outline hover:text-on-surface p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer"
+        className="material-symbols-outlined text-on-surface-variant text-2xl hover:text-primary transition-colors cursor-pointer p-2 rounded-full hover:bg-surface-container-low"
       >
         replay_10
       </button>
@@ -31,7 +31,7 @@ export const ReaderControls: React.FC<ReaderControlsProps> = ({
       </button>
       <button
         onClick={onSkipForward}
-        className="material-symbols-outlined text-outline hover:text-on-surface p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer"
+        className="material-symbols-outlined text-on-surface-variant text-2xl hover:text-primary transition-colors cursor-pointer p-2 rounded-full hover:bg-surface-container-low"
       >
         forward_10
       </button>

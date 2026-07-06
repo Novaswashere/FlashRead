@@ -2,18 +2,17 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export interface ThemePickerProps {
-  currentTheme: "light" | "dark" | "sepia";
-  onThemeSelect: (theme: "light" | "dark" | "sepia") => void;
+  currentTheme: "light" | "dark";
+  onThemeSelect: (theme: "light" | "dark") => void;
 }
 
 export const ThemePicker: React.FC<ThemePickerProps> = ({
   currentTheme,
   onThemeSelect
 }) => {
-  const options: Array<{ id: "light" | "dark" | "sepia"; label: string; class: string }> = [
-    { id: "light", label: "Light", class: "bg-[#FFFFFF] border-zinc-200" },
-    { id: "dark", label: "Dark", class: "bg-[#0B0E14] border-[#1C202B] text-white" },
-    { id: "sepia", label: "Sepia", class: "bg-[#F4ECD8] border-[#EADFCA] text-[#434655]" }
+  const options: Array<{ id: "light" | "dark"; label: string; class: string }> = [
+    { id: "light", label: "Light", class: "bg-[#FFFFFF] border-zinc-200 text-zinc-800" },
+    { id: "dark", label: "Dark", class: "bg-[#0B0E14] border-[#1C202B] text-white" }
   ];
 
   return (

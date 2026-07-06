@@ -35,12 +35,12 @@ function ReaderContent() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [wpm, setWpm] = useState(MOCK_SETTINGS.defaultWPM);
   const [progressPercent, setProgressPercent] = useState(12); // default mock 12%
-  const [currentTheme, setCurrentTheme] = useState<"light" | "dark" | "sepia">("light");
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showSpeedPicker, setShowSpeedPicker] = useState(false);
 
   // Sync theme changes with document styles
-  const handleThemeChange = (theme: "light" | "dark" | "sepia") => {
+  const handleThemeChange = (theme: "light" | "dark") => {
     setCurrentTheme(theme);
     const root = window.document.documentElement;
     root.classList.remove("light", "dark", "sepia");
@@ -94,27 +94,30 @@ function ReaderContent() {
             remainingTimeLabel="18:45 remaining"
             onProgressScrub={setProgressPercent}
           />
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => setShowSpeedPicker((prev) => !prev)}
-              className="flex flex-col items-start hover:bg-surface-container-low px-3 py-1 rounded-lg transition-colors cursor-pointer text-left"
-            >
-              <span className="font-label-mono text-[10px] text-on-surface-variant uppercase">Speed</span>
-              <div className="flex items-baseline gap-1">
-                <span className="font-label-mono text-lg text-primary font-bold">{wpm}</span>
-                <span className="font-label-mono text-[10px] text-on-surface-variant">WPM</span>
-              </div>
-            </button>
+          <div className="relative flex items-center justify-between w-full min-h-[56px]">
+            <div className="flex justify-start">
+              <button
+                onClick={() => setShowSpeedPicker((prev) => !prev)}
+                className="flex flex-col items-start hover:bg-surface-container-low px-3 py-1 rounded-lg transition-colors cursor-pointer text-left"
+              >
+                <span className="font-label-mono text-[10px] text-on-surface-variant uppercase">Speed</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="font-label-mono text-lg text-primary font-bold">{wpm}</span>
+                  <span className="font-label-mono text-[10px] text-on-surface-variant">WPM</span>
+                </div>
+              </button>
+            </div>
 
-            <ReaderControls
-              isPlaying={isPlaying}
-              onPlayToggle={() => setIsPlaying((prev) => !prev)}
-              onSkipBack={() => setProgressPercent((prev) => Math.max(0, prev - 5))}
-              onSkipForward={() => setProgressPercent((prev) => Math.min(100, prev + 5))}
-            />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+              <ReaderControls
+                isPlaying={isPlaying}
+                onPlayToggle={() => setIsPlaying((prev) => !prev)}
+                onSkipBack={() => setProgressPercent((prev) => Math.max(0, prev - 5))}
+                onSkipForward={() => setProgressPercent((prev) => Math.min(100, prev + 5))}
+              />
+            </div>
 
-            <div className="flex items-center gap-space-md">
-              <ThemePicker currentTheme={currentTheme} onThemeSelect={handleThemeChange} />
+            <div className="flex justify-end items-center gap-space-sm sm:gap-space-md">
               <ReaderStats wordsRead={1200} totalWords={10000} currentWPM={wpm} />
             </div>
           </div>
@@ -131,7 +134,13 @@ function ReaderContent() {
         </div>
       )}
 
-      {showShortcuts && <KeyboardShortcutsHelp onClose={() => setShowShortcuts(false)} />}
+      {showShortcuts && (
+        <KeyboardShortcutsHelp
+          onClose={() => setShowShortcuts(false)}
+          currentTheme={currentTheme}
+          onThemeSelect={handleThemeChange}
+        />
+      )}
     </div>
   );
 }
