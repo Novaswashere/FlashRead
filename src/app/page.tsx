@@ -39,21 +39,51 @@ export default function HomePage() {
     router.push(`/reader?id=${book.id}`);
   };
 
+  // Mobile library books (exactly the 5 books shown in the stich mobile mockup)
+  const mobileBooks = MOCK_BOOKS.filter((b) =>
+    [
+      "book-dune",
+      "book-1984",
+      "book-brave-new-world",
+      "book-moby-dick",
+      "book-pride-prejudice",
+    ].includes(b.id)
+  );
+
   return (
     <main className="pt-24 pb-32 max-w-container-max mx-auto px-space-md md:px-space-xl md:pl-72 text-left">
-      <ContinueReadingHero
-        book={activeBook}
-        progress={activeProgress}
-        defaultWpm={MOCK_SETTINGS.defaultWPM}
-        onResume={() => handleSelectBook(activeBook)}
-      />
-      <RecentBooksCarousel
-        books={recentBooks}
-        progress={MOCK_PROGRESS}
-        onSelectBook={handleSelectBook}
-      />
-      <QuickImportCard onImportClick={() => router.push("/import")} />
-      <LibraryGrid books={MOCK_BOOKS} onSelectBook={handleSelectBook} />
+      {/* Mobile-only Home Layout */}
+      <div className="block md:hidden">
+        <ContinueReadingHero
+          book={activeBook}
+          progress={activeProgress}
+          defaultWpm={MOCK_SETTINGS.defaultWPM}
+          onResume={() => handleSelectBook(activeBook)}
+        />
+        <RecentBooksCarousel
+          books={recentBooks}
+          progress={MOCK_PROGRESS}
+          onSelectBook={handleSelectBook}
+        />
+        <LibraryGrid books={mobileBooks} onSelectBook={handleSelectBook} />
+      </div>
+
+      {/* Desktop-only Home Layout */}
+      <div className="hidden md:block">
+        <ContinueReadingHero
+          book={activeBook}
+          progress={activeProgress}
+          defaultWpm={MOCK_SETTINGS.defaultWPM}
+          onResume={() => handleSelectBook(activeBook)}
+        />
+        <RecentBooksCarousel
+          books={recentBooks}
+          progress={MOCK_PROGRESS}
+          onSelectBook={handleSelectBook}
+        />
+        <QuickImportCard onImportClick={() => router.push("/import")} />
+        <LibraryGrid books={MOCK_BOOKS} onSelectBook={handleSelectBook} />
+      </div>
     </main>
   );
 }

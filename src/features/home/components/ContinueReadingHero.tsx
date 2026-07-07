@@ -29,6 +29,7 @@ export const ContinueReadingHero: React.FC<ContinueReadingHeroProps> = ({
             title={book.title}
             coverUrl={book.coverUrl}
             progressPercent={percent}
+            className="w-full h-full !aspect-auto md:w-full md:aspect-[2/3] md:h-auto"
           />
         </div>
         <div className="flex-1 flex flex-col justify-center py-space-sm w-full">
