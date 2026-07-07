@@ -16,7 +16,11 @@ export function useImport() {
         id: parsed.bookId,
         title: file.name,
         author: "Unknown Author",
-        format: file.name.endsWith(".epub") ? "epub" : file.name.endsWith(".pdf") ? "pdf" : "txt",
+        format: file.name.endsWith(".epub")
+          ? "epub"
+          : file.name.endsWith(".pdf")
+            ? "pdf"
+            : "txt",
         chapterCount: parsed.chapters.length,
         createdAt: new Date().toISOString(),
       });

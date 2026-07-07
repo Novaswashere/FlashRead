@@ -16,7 +16,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   description,
   actionLabel,
   onAction,
-  className
+  className,
 }) => {
   return (
     <div
@@ -29,8 +29,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <span className="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-4xl mb-2">
         {icon}
       </span>
-      <h3 className="font-headline-md text-headline-md text-on-surface mb-1">{title}</h3>
-      <p className="text-on-surface-variant max-w-xs mx-auto text-sm mb-4">{description}</p>
+      <h3 className="font-headline-md text-headline-md text-on-surface mb-1">
+        {title}
+      </h3>
+      <p className="text-on-surface-variant max-w-xs mx-auto text-sm mb-4">
+        {description}
+      </p>
       {actionLabel && onAction && (
         <button
           onClick={(e) => {

@@ -7,7 +7,7 @@ export interface PasteTextCardProps {
 }
 
 export const PasteTextCard: React.FC<PasteTextCardProps> = ({
-  onPasteText
+  onPasteText,
 }) => {
   const [text, setText] = useState("");
 
@@ -18,12 +18,17 @@ export const PasteTextCard: React.FC<PasteTextCardProps> = ({
   };
 
   return (
-    <Card className="bg-surface-container-lowest border border-border-subtle rounded-xl p-space-lg" id="paste-section">
+    <Card
+      className="bg-surface-container-lowest border border-border-subtle rounded-xl p-space-lg"
+      id="paste-section"
+    >
       <div className="flex items-center justify-between mb-space-md">
         <label className="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">
           Quick Paste &amp; Read
         </label>
-        <span className="text-xs text-outline font-label-mono">{text.length.toLocaleString()} characters</span>
+        <span className="text-xs text-outline font-label-mono">
+          {text.length.toLocaleString()} characters
+        </span>
       </div>
       <textarea
         className="w-full min-h-[320px] bg-transparent border-none focus:ring-0 font-body-md text-on-surface resize-none custom-scrollbar p-0 outline-none"
@@ -38,7 +43,11 @@ export const PasteTextCard: React.FC<PasteTextCardProps> = ({
         >
           Clear
         </button>
-        <Button variant="primary" onClick={handleProcess} className="h-10 text-sm">
+        <Button
+          variant="primary"
+          onClick={handleProcess}
+          className="h-10 text-sm"
+        >
           Process Text
         </Button>
       </div>

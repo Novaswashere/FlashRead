@@ -2,7 +2,7 @@ import React from "react";
 import { Slider } from "@/components/ui/Slider";
 
 export interface ReaderProgressProps {
-  progressPercent: number; 
+  progressPercent: number;
   elapsedTimeLabel: string;
   remainingTimeLabel: string;
   onProgressScrub: (percent: number) => void;
@@ -12,7 +12,7 @@ export const ReaderProgress: React.FC<ReaderProgressProps> = ({
   progressPercent,
   elapsedTimeLabel,
   remainingTimeLabel,
-  onProgressScrub
+  onProgressScrub,
 }) => {
   return (
     <div className="flex flex-col gap-2 w-full">

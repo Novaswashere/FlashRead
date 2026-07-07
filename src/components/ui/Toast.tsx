@@ -12,7 +12,7 @@ export const Toast: React.FC<ToastProps> = ({
   message,
   type = "info",
   isVisible,
-  onClose
+  onClose,
 }) => {
   if (!isVisible) return null;
 
@@ -20,9 +20,12 @@ export const Toast: React.FC<ToastProps> = ({
     <div
       className={cn(
         "fixed bottom-20 right-6 md:right-10 z-[70] flex items-center justify-between gap-space-md p-space-md rounded-xl border shadow-lg max-w-sm transition-transform duration-300",
-        type === "info" && "bg-surface-container border-border-subtle text-on-surface",
-        type === "success" && "bg-secondary-container border-primary/20 text-on-secondary-container",
-        type === "error" && "bg-error-container border-error/20 text-on-error-container"
+        type === "info" &&
+          "bg-surface-container border-border-subtle text-on-surface",
+        type === "success" &&
+          "bg-secondary-container border-primary/20 text-on-secondary-container",
+        type === "error" &&
+          "bg-error-container border-error/20 text-on-error-container"
       )}
     >
       <span className="text-sm font-medium">{message}</span>

@@ -8,7 +8,7 @@ export interface LibraryFiltersProps {
 
 export const LibraryFilters: React.FC<LibraryFiltersProps> = ({
   activeFilter,
-  onFilterChange
+  onFilterChange,
 }) => {
   const filters = ["All", "EPUB", "PDF", "TXT"];
 

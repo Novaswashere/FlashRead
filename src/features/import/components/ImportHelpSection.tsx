@@ -6,9 +6,12 @@ export const ImportHelpSection: React.FC = () => {
       <div className="p-space-lg bg-surface-container-low rounded-xl flex gap-space-md">
         <span className="material-symbols-outlined text-primary">speed</span>
         <div className="text-left">
-          <h4 className="font-semibold text-on-surface mb-1">Optimized Processing</h4>
+          <h4 className="font-semibold text-on-surface mb-1">
+            Optimized Processing
+          </h4>
           <p className="text-sm text-on-surface-variant">
-            Our RSVP engine automatically parses chapters and removes metadata for a cleaner experience.
+            Our RSVP engine automatically parses chapters and removes metadata
+            for a cleaner experience.
           </p>
         </div>
       </div>
@@ -17,7 +20,8 @@ export const ImportHelpSection: React.FC = () => {
         <div className="text-left">
           <h4 className="font-semibold text-on-surface mb-1">Privacy First</h4>
           <p className="text-sm text-on-surface-variant">
-            All processing happens in your browser. Your files are never uploaded to our servers.
+            All processing happens in your browser. Your files are never
+            uploaded to our servers.
           </p>
         </div>
       </div>

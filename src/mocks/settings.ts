@@ -7,5 +7,5 @@ export const MOCK_SETTINGS: Settings = {
   fontSize: 48,
   orpEnabled: true,
   smartPauseEnabled: true,
-  readingMode: "rsvp"
+  readingMode: "rsvp",
 };

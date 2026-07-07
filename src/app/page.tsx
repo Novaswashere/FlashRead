@@ -15,18 +15,24 @@ export default function HomePage() {
   const router = useRouter();
 
   // Active book is Kafka Metamorphosis
-  const activeBook = MOCK_BOOKS.find((b) => b.id === "book-metamorphosis") || MOCK_BOOKS[0];
+  const activeBook =
+    MOCK_BOOKS.find((b) => b.id === "book-metamorphosis") || MOCK_BOOKS[0];
   const activeProgress = MOCK_PROGRESS[activeBook.id] || {
     bookId: activeBook.id,
     currentChapterIndex: 0,
     currentWordIndex: 0,
     readingTime: 0,
-    lastOpened: new Date().toISOString()
+    lastOpened: new Date().toISOString(),
   };
 
   // Recent books are Dune, 1984, Brave New World, Moby Dick
   const recentBooks = MOCK_BOOKS.filter((b) =>
-    ["book-atomic-habits", "book-deep-work", "book-great-gatsby", "book-thinking-fast"].includes(b.id)
+    [
+      "book-atomic-habits",
+      "book-deep-work",
+      "book-great-gatsby",
+      "book-thinking-fast",
+    ].includes(b.id)
   );
 
   const handleSelectBook = (book: Book) => {

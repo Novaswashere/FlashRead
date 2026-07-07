@@ -19,7 +19,9 @@ export class ParserService implements IDocumentParser {
       return this.clipboardParser.parse(data, title);
     }
 
-    const extension = data.name.substring(data.name.lastIndexOf(".")).toLowerCase();
+    const extension = data.name
+      .substring(data.name.lastIndexOf("."))
+      .toLowerCase();
     switch (extension) {
       case ".epub":
         return this.epubParser.parse(data);

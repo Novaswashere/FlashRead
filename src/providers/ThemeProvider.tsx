@@ -11,7 +11,9 @@ interface ThemeContextProps {
 
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [theme, setThemeState] = useState<Theme>("light");
 
   const setTheme = (newTheme: Theme) => {
@@ -23,7 +25,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.classList.remove("light", "dark", "sepia");
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
       root.classList.add(systemTheme);
     } else {
       root.classList.add(theme);

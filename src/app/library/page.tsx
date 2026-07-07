@@ -31,14 +31,18 @@ export default function LibraryPage() {
       b.title.toLowerCase().includes(search.toLowerCase()) ||
       b.author.toLowerCase().includes(search.toLowerCase());
     const matchesFilter =
-      activeFilter === "All" || b.format.toLowerCase() === activeFilter.toLowerCase();
+      activeFilter === "All" ||
+      b.format.toLowerCase() === activeFilter.toLowerCase();
     return matchesSearch && matchesFilter;
   });
 
   return (
     <main className="pt-24 pb-20 px-space-md md:px-space-xl max-w-[900px] mx-auto min-h-screen md:pl-72 text-left">
       <LibrarySearch value={search} onChange={setSearch} />
-      <LibraryFilters activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+      <LibraryFilters
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
 
       {isLoading ? (
         <LoadingLibraryState />

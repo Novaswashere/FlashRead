@@ -7,9 +7,10 @@ export interface ReaderWordDisplayProps {
 
 export const ReaderWordDisplay: React.FC<ReaderWordDisplayProps> = ({
   word,
-  orpIndex
+  orpIndex,
 }) => {
-  const index = word.length > 0 ? Math.min(Math.max(0, orpIndex), word.length - 1) : 0;
+  const index =
+    word.length > 0 ? Math.min(Math.max(0, orpIndex), word.length - 1) : 0;
   const prefix = word.substring(0, index);
   const orpChar = word.charAt(index);
   const suffix = word.substring(index + 1);
@@ -18,7 +19,9 @@ export const ReaderWordDisplay: React.FC<ReaderWordDisplayProps> = ({
     <div className="relative z-10 select-none">
       <div className="flex font-display-rsvp text-display-rsvp-mobile md:text-display-rsvp tracking-tight">
         <span className="text-on-surface">{prefix}</span>
-        <span className="text-orp-highlight">{orpChar}</span>
+        <span className="text-primary font-bold drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] dark:drop-shadow-[0_0_12px_rgba(6,182,212,1)] transition-all duration-75">
+          {orpChar}
+        </span>
         <span className="text-on-surface">{suffix}</span>
       </div>
     </div>

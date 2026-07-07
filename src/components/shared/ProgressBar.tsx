@@ -8,7 +8,7 @@ export interface ProgressBarProps {
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
-  className
+  className,
 }) => {
   const progress = Math.min(100, Math.max(0, value));
 

@@ -11,7 +11,7 @@ export const ReaderControls: React.FC<ReaderControlsProps> = ({
   isPlaying,
   onPlayToggle,
   onSkipBack,
-  onSkipForward
+  onSkipForward,
 }) => {
   return (
     <div className="flex items-center justify-center gap-space-lg my-space-md">
@@ -25,7 +25,10 @@ export const ReaderControls: React.FC<ReaderControlsProps> = ({
         onClick={onPlayToggle}
         className="w-14 h-14 rounded-full bg-primary hover:bg-primary/95 text-on-primary flex items-center justify-center shadow-md active:scale-95 transition-all cursor-pointer"
       >
-        <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <span
+          className="material-symbols-outlined text-3xl"
+          style={{ fontVariationSettings: "'FILL' 1" }}
+        >
           {isPlaying ? "pause" : "play_arrow"}
         </span>
       </button>

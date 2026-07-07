@@ -7,19 +7,23 @@ export interface ThemeSectionProps {
 
 export const ThemeSection: React.FC<ThemeSectionProps> = ({
   currentTheme,
-  onThemeChange
+  onThemeChange,
 }) => {
   return (
     <div className="p-space-md flex flex-col gap-space-md">
       <div className="flex items-center gap-space-md">
-        <span className="material-symbols-outlined text-secondary">contrast</span>
+        <span className="material-symbols-outlined text-secondary">
+          contrast
+        </span>
         <p className="font-medium">Interface Theme</p>
       </div>
       <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => onThemeChange("light")}
           className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border-2 ${
-            currentTheme === "light" ? "border-primary bg-primary-container/10" : "border-border-subtle hover:bg-surface-container-low"
+            currentTheme === "light"
+              ? "border-primary bg-primary-container/10"
+              : "border-border-subtle hover:bg-surface-container-low"
           }`}
         >
           <span className="material-symbols-outlined">light_mode</span>
@@ -28,7 +32,9 @@ export const ThemeSection: React.FC<ThemeSectionProps> = ({
         <button
           onClick={() => onThemeChange("dark")}
           className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border-2 ${
-            currentTheme === "dark" ? "border-primary bg-primary-container/10" : "border-border-subtle hover:bg-surface-container-low"
+            currentTheme === "dark"
+              ? "border-primary bg-primary-container/10"
+              : "border-border-subtle hover:bg-surface-container-low"
           }`}
         >
           <span className="material-symbols-outlined">dark_mode</span>
@@ -37,7 +43,9 @@ export const ThemeSection: React.FC<ThemeSectionProps> = ({
         <button
           onClick={() => onThemeChange("system")}
           className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border-2 ${
-            currentTheme === "system" ? "border-primary bg-primary-container/10" : "border-border-subtle hover:bg-surface-container-low"
+            currentTheme === "system"
+              ? "border-primary bg-primary-container/10"
+              : "border-border-subtle hover:bg-surface-container-low"
           }`}
         >
           <span className="material-symbols-outlined">settings_brightness</span>

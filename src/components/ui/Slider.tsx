@@ -16,8 +16,16 @@ export const Slider: React.FC<SliderProps> = ({
     <div className="flex flex-col w-full">
       {(labelMin || labelMax) && (
         <div className="flex justify-between mb-2">
-          {labelMin && <span className="font-label-mono text-label-mono text-on-surface-variant">{labelMin}</span>}
-          {labelMax && <span className="font-label-mono text-label-mono text-on-surface-variant">{labelMax}</span>}
+          {labelMin && (
+            <span className="font-label-mono text-label-mono text-on-surface-variant">
+              {labelMin}
+            </span>
+          )}
+          {labelMax && (
+            <span className="font-label-mono text-label-mono text-on-surface-variant">
+              {labelMax}
+            </span>
+          )}
         </div>
       )}
       <input

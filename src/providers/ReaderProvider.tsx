@@ -1,58 +1,30 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
-import { Book, ParsedBook, ReadingProgress } from "../types";
+import React, { createContext, useContext } from "react";
+import { useRsvpEngine } from "../features/reader/hooks/useRsvpEngine";
+import {
+  PlaybackSnapshot,
+  PlaybackActions,
+} from "../features/reader/engine/types";
+import { MOCK_READER_TEXT } from "../mocks/readerText";
 
 interface ReaderContextProps {
-  currentBook: Book | null;
-  parsedBook: ParsedBook | null;
-  progress: ReadingProgress | null;
-  isPlaying: boolean;
-  wpm: number;
-  setWpm: (wpm: number) => void;
-  play: () => void;
-  pause: () => void;
-  seek: (wordIndex: number) => void;
-  loadBook: (book: Book, parsed: ParsedBook, progress?: ReadingProgress) => void;
+  snapshot: PlaybackSnapshot;
+  actions: PlaybackActions;
 }
 
 const ReaderContext = createContext<ReaderContextProps | undefined>(undefined);
 
-export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentBook, setCurrentBook] = useState<Book | null>(null);
-  const [parsedBook, setParsedBook] = useState<ParsedBook | null>(null);
-  const [progress, setProgress] = useState<ReadingProgress | null>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [wpm, setWpm] = useState<number>(350);
-
-  const play = () => setIsPlaying(true);
-  const pause = () => setIsPlaying(false);
-  const seek = (wordIndex: number) => {
-    // Stub seeking operation
-  };
-  const loadBook = (book: Book, parsed: ParsedBook, prog?: ReadingProgress) => {
-    setCurrentBook(book);
-    setParsedBook(parsed);
-    if (prog) {
-      setProgress(prog);
-    }
-  };
+export const ReaderProvider: React.FC<{
+  text?: string;
+  initialWpm?: number;
+  children: React.ReactNode;
+}> = ({ text, initialWpm = 350, children }) => {
+  const content = text ?? MOCK_READER_TEXT;
+  const { snapshot, actions } = useRsvpEngine(content, initialWpm);
 
   return (
-    <ReaderContext.Provider
-      value={{
-        currentBook,
-        parsedBook,
-        progress,
-        isPlaying,
-        wpm,
-        setWpm,
-        play,
-        pause,
-        seek,
-        loadBook,
-      }}
-    >
+    <ReaderContext.Provider value={{ snapshot, actions }}>
       {children}
     </ReaderContext.Provider>
   );

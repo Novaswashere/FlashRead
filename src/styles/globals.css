@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -15,37 +15,37 @@
   --surface-container-highest: #e0e3e5;
   --on-surface: #191c1e;
   --on-surface-variant: #434655;
-  --border-subtle: #E2E8F0;
+  --border-subtle: #e2e8f0;
   --primary: #004ac6;
   --on-primary: #ffffff;
 }
 
 .dark {
-  --background: #0B0E14;
-  --on-background: #E2E8F0;
+  --background: #0b0e14;
+  --on-background: #e2e8f0;
   --surface-container-lowest: #141822;
-  --surface-container-low: #1C202E;
-  --surface-container: #24293A;
-  --surface-container-high: #2C3246;
-  --surface-container-highest: #353C52;
-  --on-surface: #F8FAFC;
-  --on-surface-variant: #94A3B8;
-  --border-subtle: #3F465C;
+  --surface-container-low: #1c202e;
+  --surface-container: #24293a;
+  --surface-container-high: #2c3246;
+  --surface-container-highest: #353c52;
+  --on-surface: #f8fafc;
+  --on-surface-variant: #94a3b8;
+  --border-subtle: #3f465c;
   --primary: #2563eb;
   --on-primary: #ffffff;
 }
 
 .sepia {
-  --background: #F4ECD8;
+  --background: #f4ecd8;
   --on-background: #434655;
-  --surface-container-lowest: #FAF6EB;
-  --surface-container-low: #EFE6D0;
-  --surface-container: #EADFCA;
-  --surface-container-high: #E3D7C0;
-  --surface-container-highest: #DCCBB6;
+  --surface-container-lowest: #faf6eb;
+  --surface-container-low: #efe6d0;
+  --surface-container: #eadfca;
+  --surface-container-high: #e3d7c0;
+  --surface-container-highest: #dccbb6;
   --on-surface: #434655;
-  --on-surface-variant: #5C5E6C;
-  --border-subtle: #D8C7B0;
+  --on-surface-variant: #5c5e6c;
+  --border-subtle: #d8c7b0;
   --primary: #943700;
   --on-primary: #ffffff;
 }
@@ -59,38 +59,47 @@
 
 /* Material symbols global sizing and settings */
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
   display: inline-block;
   line-height: 1;
 }
 
 /* RSVP Canvas guide line decorations */
-.orp-marker::before, .orp-marker::after {
-  content: '';
+.orp-marker::before,
+.orp-marker::after {
+  content: "";
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   width: 2px;
   height: 12px;
-  background-color: #EF4444;
+  background-color: #ef4444;
   opacity: 0.4;
 }
-.orp-marker::before { top: -20px; }
-.orp-marker::after { bottom: -20px; }
+.orp-marker::before {
+  top: -20px;
+}
+.orp-marker::after {
+  bottom: -20px;
+}
 
 /* Custom range slider styling */
-input[type=range] {
+input[type="range"] {
   -webkit-appearance: none;
   background: transparent;
 }
-input[type=range]::-webkit-slider-runnable-track {
+input[type="range"]::-webkit-slider-runnable-track {
   width: 100%;
   height: 4px;
   cursor: pointer;
-  background: #E2E8F0;
+  background: #e2e8f0;
   border-radius: 2px;
 }
-input[type=range]::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   height: 16px;
   width: 16px;
   border-radius: 50%;

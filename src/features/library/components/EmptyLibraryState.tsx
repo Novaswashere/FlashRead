@@ -6,7 +6,7 @@ export interface EmptyLibraryStateProps {
 }
 
 export const EmptyLibraryState: React.FC<EmptyLibraryStateProps> = ({
-  onImportClick
+  onImportClick,
 }) => {
   return (
     <EmptyState

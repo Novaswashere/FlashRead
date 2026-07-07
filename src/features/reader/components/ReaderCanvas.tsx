@@ -7,7 +7,7 @@ export interface ReaderCanvasProps {
 
 export const ReaderCanvas: React.FC<ReaderCanvasProps> = ({
   children,
-  onCanvasClick
+  onCanvasClick,
 }) => {
   return (
     <div

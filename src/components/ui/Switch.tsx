@@ -18,10 +18,16 @@ export const Switch: React.FC<SwitchProps> = ({
   return (
     <label className="p-space-md flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer group rounded-xl">
       <div className="flex items-center gap-space-md">
-        {icon && <span className="material-symbols-outlined text-secondary">{icon}</span>}
+        {icon && (
+          <span className="material-symbols-outlined text-secondary">
+            {icon}
+          </span>
+        )}
         <div>
           {label && <p className="font-medium text-on-surface">{label}</p>}
-          {description && <p className="text-xs text-on-surface-variant">{description}</p>}
+          {description && (
+            <p className="text-xs text-on-surface-variant">{description}</p>
+          )}
         </div>
       </div>
       <div className="relative inline-flex items-center cursor-pointer">

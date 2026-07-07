@@ -14,13 +14,15 @@ export const LibraryList: React.FC<LibraryListProps> = ({
   books,
   progress,
   onSelectBook,
-  onMoreActions
+  onMoreActions,
 }) => {
   return (
     <div className="flex flex-col border-t border-border-subtle">
       {books.map((book) => {
         const prog = progress[book.id];
-        const percent = prog ? Math.round((prog.currentWordIndex / 2000) * 100) : 0;
+        const percent = prog
+          ? Math.round((prog.currentWordIndex / 2000) * 100)
+          : 0;
         return (
           <div
             key={book.id}
@@ -36,14 +38,19 @@ export const LibraryList: React.FC<LibraryListProps> = ({
                   {book.title}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="font-label-mono text-label-mono text-outline line-clamp-1">{book.author}</span>
+                  <span className="font-label-mono text-label-mono text-outline line-clamp-1">
+                    {book.author}
+                  </span>
                   <span className="w-1 h-1 rounded-full bg-outline-variant shrink-0"></span>
                   <span
                     className={cn(
                       "font-label-mono text-label-mono px-1.5 py-0.5 rounded uppercase shrink-0",
-                      book.format === "epub" && "text-primary bg-primary-fixed/30",
-                      book.format === "pdf" && "text-secondary bg-surface-container-high",
-                      book.format === "txt" && "text-secondary bg-surface-container-high"
+                      book.format === "epub" &&
+                        "text-primary bg-primary-fixed/30",
+                      book.format === "pdf" &&
+                        "text-secondary bg-surface-container-high",
+                      book.format === "txt" &&
+                        "text-secondary bg-surface-container-high"
                     )}
                   >
                     {book.format}
@@ -56,12 +63,19 @@ export const LibraryList: React.FC<LibraryListProps> = ({
                 {prog ? (
                   <>
                     <div className="w-24 h-1 bg-surface-container rounded-full overflow-hidden">
-                      <div className="bg-primary h-full" style={{ width: `${percent}%` }}></div>
+                      <div
+                        className="bg-primary h-full"
+                        style={{ width: `${percent}%` }}
+                      ></div>
                     </div>
-                    <span className="font-label-mono text-label-mono text-outline mt-1">{percent}% Read</span>
+                    <span className="font-label-mono text-label-mono text-outline mt-1">
+                      {percent}% Read
+                    </span>
                   </>
                 ) : (
-                  <span className="font-label-mono text-label-mono text-outline mt-1">Unread</span>
+                  <span className="font-label-mono text-label-mono text-outline mt-1">
+                    Unread
+                  </span>
                 )}
               </div>
               <button

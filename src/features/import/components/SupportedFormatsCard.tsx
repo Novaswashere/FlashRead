@@ -5,13 +5,13 @@ export interface SupportedFormatsCardProps {
 }
 
 export const SupportedFormatsCard: React.FC<SupportedFormatsCardProps> = ({
-  onFormatSelect
+  onFormatSelect,
 }) => {
   const formats = [
     { label: "Upload EPUB", icon: "book" },
     { label: "Upload PDF", icon: "picture_as_pdf" },
     { label: "Upload TXT", icon: "description" },
-    { label: "Paste Text", icon: "content_paste" }
+    { label: "Paste Text", icon: "content_paste" },
   ];
 
   return (
@@ -25,7 +25,9 @@ export const SupportedFormatsCard: React.FC<SupportedFormatsCardProps> = ({
           <span className="material-symbols-outlined text-4xl mb-space-sm text-outline group-hover:text-primary transition-colors">
             {fmt.icon}
           </span>
-          <span className="font-label-mono text-label-mono uppercase tracking-widest">{fmt.label}</span>
+          <span className="font-label-mono text-label-mono uppercase tracking-widest">
+            {fmt.label}
+          </span>
         </button>
       ))}
     </div>

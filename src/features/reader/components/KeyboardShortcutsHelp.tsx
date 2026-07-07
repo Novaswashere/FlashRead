@@ -10,13 +10,13 @@ export interface KeyboardShortcutsHelpProps {
 export const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
   onClose,
   currentTheme,
-  onThemeSelect
+  onThemeSelect,
 }) => {
   const shortcuts = [
     { keys: ["Space"], description: "Play / Pause playback" },
     { keys: ["←", "→"], description: "Seek backward / forward" },
     { keys: ["↑", "↓"], description: "Increase / decrease speed" },
-    { keys: ["Esc"], description: "Exit reader mode" }
+    { keys: ["Esc"], description: "Exit reader mode" },
   ];
 
   return (
@@ -24,7 +24,9 @@ export const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
       <div className="bg-surface-container border border-border-subtle rounded-xl p-space-lg w-full max-w-sm text-left flex flex-col gap-space-lg">
         <div>
           <div className="flex items-center justify-between mb-space-md">
-            <h3 className="font-headline-md text-headline-md text-on-surface">Reader Options</h3>
+            <h3 className="font-headline-md text-headline-md text-on-surface">
+              Reader Options
+            </h3>
             <button
               onClick={onClose}
               className="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-1 rounded-full cursor-pointer"
@@ -32,11 +34,14 @@ export const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
               close
             </button>
           </div>
-          
+
           {/* Theme selection */}
           <div className="flex items-center justify-between py-2 border-b border-border-subtle">
             <span className="text-sm font-medium text-on-surface">Theme</span>
-            <ThemePicker currentTheme={currentTheme} onThemeSelect={onThemeSelect} />
+            <ThemePicker
+              currentTheme={currentTheme}
+              onThemeSelect={onThemeSelect}
+            />
           </div>
         </div>
 
@@ -46,8 +51,13 @@ export const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
           </h4>
           <div className="flex flex-col gap-3">
             {shortcuts.map((sh, idx) => (
-              <div key={idx} className="flex items-center justify-between py-1 border-b border-border-subtle last:border-b-0">
-                <span className="text-sm text-on-surface-variant">{sh.description}</span>
+              <div
+                key={idx}
+                className="flex items-center justify-between py-1 border-b border-border-subtle last:border-b-0"
+              >
+                <span className="text-sm text-on-surface-variant">
+                  {sh.description}
+                </span>
                 <div className="flex gap-1">
                   {sh.keys.map((k, kIdx) => (
                     <kbd

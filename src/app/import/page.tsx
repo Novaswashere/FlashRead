@@ -51,14 +51,19 @@ export default function ImportPage() {
     <main className="pt-24 pb-20 md:pb-8 md:pl-72 px-space-md max-w-container-max mx-auto min-h-screen text-left">
       <div className="max-w-[800px] mx-auto">
         <div className="mb-space-xl">
-          <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2">Import New Content</h2>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2">
+            Import New Content
+          </h2>
           <p className="text-on-surface-variant font-body-md">
             Add documents or raw text to your library to start speed reading.
           </p>
         </div>
 
         <SupportedFormatsCard onFormatSelect={handleFormatSelect} />
-        <UploadDropzone onFileDrop={handleFileDrop} isProcessing={isProcessing} />
+        <UploadDropzone
+          onFileDrop={handleFileDrop}
+          isProcessing={isProcessing}
+        />
         <PasteTextCard onPasteText={handlePasteText} />
         <ImportHelpSection />
       </div>

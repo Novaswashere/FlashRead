@@ -9,7 +9,8 @@ import { BottomNavBar } from "@/components/layout/BottomNavBar";
 
 export const metadata = {
   title: "FlashRead - Focus Your Mind",
-  description: "A professional e-reader app optimized for rapid serial visual presentation reading.",
+  description:
+    "A professional e-reader app optimized for rapid serial visual presentation reading.",
 };
 
 export default function RootLayout({
@@ -28,9 +29,7 @@ export default function RootLayout({
                   <TopAppBar />
                   <div className="flex flex-1">
                     <NavigationDrawer />
-                    <div className="flex-1">
-                      {children}
-                    </div>
+                    <div className="flex-1">{children}</div>
                   </div>
                   <BottomNavBar />
                 </div>

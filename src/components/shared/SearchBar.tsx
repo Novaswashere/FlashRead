@@ -12,7 +12,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Search...",
   value,
   onChange,
-  className
+  className,
 }) => {
   return (
     <div className={cn("relative group w-full", className)}>

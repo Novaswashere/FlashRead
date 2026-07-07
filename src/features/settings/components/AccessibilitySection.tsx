@@ -12,7 +12,7 @@ export const AccessibilitySection: React.FC<AccessibilitySectionProps> = ({
   reducedMotion,
   screenReaderOptimized,
   onReducedMotionChange,
-  onScreenReaderChange
+  onScreenReaderChange,
 }) => {
   return (
     <div className="flex flex-col">

@@ -8,12 +8,21 @@ export interface ThemePickerProps {
 
 export const ThemePicker: React.FC<ThemePickerProps> = ({
   currentTheme,
-  onThemeSelect
+  onThemeSelect,
 }) => {
-  const options: Array<{ id: "light" | "dark"; label: string; class: string }> = [
-    { id: "light", label: "Light", class: "bg-[#FFFFFF] border-zinc-200 text-zinc-800" },
-    { id: "dark", label: "Dark", class: "bg-[#0B0E14] border-[#1C202B] text-white" }
-  ];
+  const options: Array<{ id: "light" | "dark"; label: string; class: string }> =
+    [
+      {
+        id: "light",
+        label: "Light",
+        class: "bg-[#FFFFFF] border-zinc-200 text-zinc-800",
+      },
+      {
+        id: "dark",
+        label: "Dark",
+        class: "bg-[#0B0E14] border-[#1C202B] text-white",
+      },
+    ];
 
   return (
     <div className="flex gap-2">
@@ -24,7 +33,9 @@ export const ThemePicker: React.FC<ThemePickerProps> = ({
           className={cn(
             "w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer",
             opt.class,
-            currentTheme === opt.id ? "ring-2 ring-primary ring-offset-2 scale-110" : "hover:scale-105"
+            currentTheme === opt.id
+              ? "ring-2 ring-primary ring-offset-2 scale-110"
+              : "hover:scale-105"
           )}
           title={opt.label}
           aria-label={opt.label}

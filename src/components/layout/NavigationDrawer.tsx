@@ -27,7 +27,8 @@ export const NavigationDrawer: React.FC = () => {
               href={link.href}
               className={cn(
                 "flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-xl transition-all duration-200 active:translate-x-1",
-                isActive && "bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary font-bold"
+                isActive &&
+                  "bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary font-bold"
               )}
             >
               <span className="material-symbols-outlined">{link.icon}</span>

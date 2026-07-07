@@ -11,7 +11,7 @@ export interface BookCardProps {
 export const BookCard: React.FC<BookCardProps> = ({
   book,
   progressPercent,
-  onSelect
+  onSelect,
 }) => {
   return (
     <div

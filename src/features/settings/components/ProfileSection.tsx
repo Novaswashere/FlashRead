@@ -8,7 +8,7 @@ export interface ProfileSectionProps {
 
 export const ProfileSection: React.FC<ProfileSectionProps> = ({
   user,
-  onSignOut
+  onSignOut,
 }) => {
   return (
     <div className="flex flex-col text-left">
@@ -26,15 +26,22 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             <p className="text-xs text-on-surface-variant">{user.email}</p>
           </div>
         </div>
-        <button className="text-primary text-sm font-bold hover:underline">Edit</button>
+        <button className="text-primary text-sm font-bold hover:underline">
+          Edit
+        </button>
       </div>
 
-      <a className="p-space-md flex items-center justify-between hover:bg-surface-container-low transition-colors" href="#">
+      <a
+        className="p-space-md flex items-center justify-between hover:bg-surface-container-low transition-colors"
+        href="#"
+      >
         <div className="flex items-center gap-space-md">
           <span className="material-symbols-outlined text-secondary">sync</span>
           <p className="font-medium text-on-surface">Cloud Synchronization</p>
         </div>
-        <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+        <span className="material-symbols-outlined text-on-surface-variant">
+          chevron_right
+        </span>
       </a>
 
       <button

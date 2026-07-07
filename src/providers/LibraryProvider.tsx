@@ -11,9 +11,13 @@ interface LibraryContextProps {
   refreshLibrary: () => Promise<void>;
 }
 
-const LibraryContext = createContext<LibraryContextProps | undefined>(undefined);
+const LibraryContext = createContext<LibraryContextProps | undefined>(
+  undefined
+);
 
-export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -28,7 +32,9 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   return (
-    <LibraryContext.Provider value={{ books, isLoading, addBook, removeBook, refreshLibrary }}>
+    <LibraryContext.Provider
+      value={{ books, isLoading, addBook, removeBook, refreshLibrary }}
+    >
       {children}
     </LibraryContext.Provider>
   );

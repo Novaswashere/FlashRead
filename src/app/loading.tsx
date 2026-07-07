@@ -8,7 +8,10 @@ export default function HomeLoading() {
       <div className="h-6 w-36 bg-surface-container-high rounded mb-4"></div>
       <div className="flex gap-4 overflow-x-auto pb-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="w-40 h-60 bg-surface-container rounded-lg flex-shrink-0"></div>
+          <div
+            key={i}
+            className="w-40 h-60 bg-surface-container rounded-lg flex-shrink-0"
+          ></div>
         ))}
       </div>
     </div>

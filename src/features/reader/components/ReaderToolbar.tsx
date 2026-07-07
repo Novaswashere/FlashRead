@@ -13,7 +13,7 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
   chapterLabel,
   onBackClick,
   onTextSettingsClick,
-  onMoreActionsClick
+  onMoreActionsClick,
 }) => {
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-border-subtle md:pr-64">
@@ -26,7 +26,9 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
             arrow_back
           </button>
           <div className="flex flex-col text-left">
-            <h1 className="font-headline-md text-[18px] leading-none text-on-surface line-clamp-1">{title}</h1>
+            <h1 className="font-headline-md text-[18px] leading-none text-on-surface line-clamp-1">
+              {title}
+            </h1>
             <p className="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">
               {chapterLabel}
             </p>

@@ -7,12 +7,18 @@ export default function LibraryLoading() {
       <div className="h-12 w-full bg-surface-container rounded-xl mb-6"></div>
       <div className="flex gap-2 mb-8">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-8 w-16 bg-surface-container rounded-full"></div>
+          <div
+            key={i}
+            className="h-8 w-16 bg-surface-container rounded-full"
+          ></div>
         ))}
       </div>
       <div className="flex flex-col gap-4">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-16 w-full bg-surface-container rounded-lg"></div>
+          <div
+            key={i}
+            className="h-16 w-full bg-surface-container rounded-lg"
+          ></div>
         ))}
       </div>
     </div>

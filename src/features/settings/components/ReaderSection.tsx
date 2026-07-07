@@ -16,17 +16,23 @@ export const ReaderSection: React.FC<ReaderSectionProps> = ({
   smartPauseEnabled,
   onWpmChange,
   onOrpChange,
-  onSmartPauseChange
+  onSmartPauseChange,
 }) => {
   return (
     <div className="flex flex-col">
       {/* WPM Setting */}
       <div className="p-space-md flex items-center justify-between hover:bg-surface-container-low transition-colors">
         <div className="flex items-center gap-space-md text-left">
-          <span className="material-symbols-outlined text-secondary">speed</span>
+          <span className="material-symbols-outlined text-secondary">
+            speed
+          </span>
           <div>
-            <p className="font-medium text-on-surface">Words Per Minute (WPM)</p>
-            <p className="text-xs text-on-surface-variant">Adjust your target reading speed</p>
+            <p className="font-medium text-on-surface">
+              Words Per Minute (WPM)
+            </p>
+            <p className="text-xs text-on-surface-variant">
+              Adjust your target reading speed
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -36,7 +42,9 @@ export const ReaderSection: React.FC<ReaderSectionProps> = ({
             value={defaultWpm}
             onChange={(e) => onWpmChange(parseInt(e.target.value) || 350)}
           />
-          <span className="text-xs font-label-mono text-on-surface-variant">WPM</span>
+          <span className="text-xs font-label-mono text-on-surface-variant">
+            WPM
+          </span>
         </div>
       </div>
 

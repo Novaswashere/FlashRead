@@ -8,7 +8,7 @@ export interface UploadDropzoneProps {
 
 export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
   onFileDrop,
-  isProcessing
+  isProcessing,
 }) => {
   const [dragActive, setDragActive] = useState(false);
 
@@ -50,14 +50,24 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
     >
       {isProcessing ? (
         <div className="text-center animate-pulse flex flex-col items-center">
-          <span className="material-symbols-outlined text-6xl text-primary mb-4 animate-spin">sync</span>
-          <p className="font-body-lg text-body-lg font-semibold text-primary">Processing document...</p>
+          <span className="material-symbols-outlined text-6xl text-primary mb-4 animate-spin">
+            sync
+          </span>
+          <p className="font-body-lg text-body-lg font-semibold text-primary">
+            Processing document...
+          </p>
         </div>
       ) : (
         <>
-          <span className="material-symbols-outlined text-6xl text-outline mb-4">cloud_upload</span>
-          <p className="font-body-lg text-body-lg font-semibold text-on-surface">Drag &amp; drop files here</p>
-          <p className="text-on-surface-variant text-sm mt-2">or tap to browse locally</p>
+          <span className="material-symbols-outlined text-6xl text-outline mb-4">
+            cloud_upload
+          </span>
+          <p className="font-body-lg text-body-lg font-semibold text-on-surface">
+            Drag &amp; drop files here
+          </p>
+          <p className="text-on-surface-variant text-sm mt-2">
+            or tap to browse locally
+          </p>
           <input
             accept=".epub,.pdf,.txt"
             className="absolute inset-0 opacity-0 cursor-pointer"

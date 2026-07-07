@@ -10,7 +10,7 @@ export interface SpeedControlProps {
 export const SpeedControl: React.FC<SpeedControlProps> = ({
   currentWpm,
   onWpmChange,
-  onClose
+  onClose,
 }) => {
   return (
     <div className="p-space-md bg-surface-container border border-border-subtle rounded-xl flex flex-col gap-space-sm max-w-xs text-left">

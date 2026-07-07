@@ -9,7 +9,7 @@ export interface LibraryGridProps {
 
 export const LibraryGrid: React.FC<LibraryGridProps> = ({
   books,
-  onSelectBook
+  onSelectBook,
 }) => {
   return (
     <section>
@@ -17,10 +17,14 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
         <h2 className="font-headline-md text-headline-md">My Library</h2>
         <div className="flex items-center gap-space-sm">
           <button className="p-2 rounded-lg border border-border-subtle hover:bg-surface-container-low transition-colors">
-            <span className="material-symbols-outlined text-on-surface-variant">filter_list</span>
+            <span className="material-symbols-outlined text-on-surface-variant">
+              filter_list
+            </span>
           </button>
           <button className="p-2 rounded-lg border border-border-subtle hover:bg-surface-container-low transition-colors">
-            <span className="material-symbols-outlined text-on-surface-variant">grid_view</span>
+            <span className="material-symbols-outlined text-on-surface-variant">
+              grid_view
+            </span>
           </button>
         </div>
       </div>

@@ -16,9 +16,15 @@ export default function SettingsPage() {
   // Local settings states populated from mocks
   const [wpm, setWpm] = useState(MOCK_SETTINGS.defaultWPM);
   const [orpEnabled, setOrpEnabled] = useState(MOCK_SETTINGS.orpEnabled);
-  const [smartPauseEnabled, setSmartPauseEnabled] = useState(MOCK_SETTINGS.smartPauseEnabled);
-  const [themeValue, setThemeValue] = useState<"light" | "dark" | "system">("light");
-  const [fontFamily, setFontFamily] = useState<"Inter" | "Open Sans" | "Merriweather" | "JetBrains Mono">("Inter");
+  const [smartPauseEnabled, setSmartPauseEnabled] = useState(
+    MOCK_SETTINGS.smartPauseEnabled
+  );
+  const [themeValue, setThemeValue] = useState<"light" | "dark" | "system">(
+    "light"
+  );
+  const [fontFamily, setFontFamily] = useState<
+    "Inter" | "Open Sans" | "Merriweather" | "JetBrains Mono"
+  >("Inter");
   const [fontSize, setFontSize] = useState(MOCK_SETTINGS.fontSize);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [screenReaderOptimized, setScreenReaderOptimized] = useState(false);
@@ -35,8 +41,12 @@ export default function SettingsPage() {
   return (
     <main className="md:ml-64 pt-24 pb-24 px-space-md md:px-space-xl min-h-screen max-w-reader-width mx-auto text-left">
       <div className="mb-space-xl">
-        <h2 className="font-headline-lg text-headline-lg text-on-surface">Settings</h2>
-        <p className="text-on-surface-variant mt-2">Configure your personalized rapid reading environment.</p>
+        <h2 className="font-headline-lg text-headline-lg text-on-surface">
+          Settings
+        </h2>
+        <p className="text-on-surface-variant mt-2">
+          Configure your personalized rapid reading environment.
+        </p>
       </div>
 
       <div className="space-y-space-xl">
@@ -63,7 +73,10 @@ export default function SettingsPage() {
             Appearance
           </h3>
           <div className="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden divide-y divide-border-subtle">
-            <ThemeSection currentTheme={themeValue} onThemeChange={handleThemeChange} />
+            <ThemeSection
+              currentTheme={themeValue}
+              onThemeChange={handleThemeChange}
+            />
             <FontSection
               currentFont={fontFamily}
               currentFontSize={fontSize}
@@ -99,7 +112,9 @@ export default function SettingsPage() {
         </section>
 
         <div className="pt-space-xl pb-space-lg text-center">
-          <p className="text-xs text-outline font-label-mono">FlashRead v2.4.0 • Build 829</p>
+          <p className="text-xs text-outline font-label-mono">
+            FlashRead v2.4.0 • Build 829
+          </p>
         </div>
       </div>
     </main>

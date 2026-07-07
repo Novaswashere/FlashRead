@@ -12,7 +12,7 @@ export const BookCover: React.FC<BookCoverProps> = ({
   title,
   coverUrl,
   progressPercent,
-  className
+  className,
 }) => {
   return (
     <div
@@ -30,8 +30,12 @@ export const BookCover: React.FC<BookCoverProps> = ({
         />
       ) : (
         <div className="flex flex-col items-center justify-center p-4 text-center">
-          <span className="material-symbols-outlined text-outline text-3xl mb-1">book</span>
-          <span className="text-xs font-semibold text-on-surface-variant line-clamp-2">{title}</span>
+          <span className="material-symbols-outlined text-outline text-3xl mb-1">
+            book
+          </span>
+          <span className="text-xs font-semibold text-on-surface-variant line-clamp-2">
+            {title}
+          </span>
         </div>
       )}
       {progressPercent !== undefined && progressPercent > 0 && (

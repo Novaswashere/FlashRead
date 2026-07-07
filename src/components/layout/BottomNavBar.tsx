@@ -32,11 +32,15 @@ export const BottomNavBar: React.FC = () => {
             >
               <span
                 className="material-symbols-outlined"
-                style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+                style={{
+                  fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0",
+                }}
               >
                 {link.icon}
               </span>
-              <span className="font-label-mono text-[10px] mt-0.5">{link.label}</span>
+              <span className="font-label-mono text-[10px] mt-0.5">
+                {link.label}
+              </span>
             </Link>
           );
         })}
