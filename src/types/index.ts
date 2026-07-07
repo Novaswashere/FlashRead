@@ -15,28 +15,8 @@ export interface Book {
   createdAt: string;
 }
 
-export interface Chapter {
-  title: string;
-  content: string;
-  wordCount: number;
-}
+export * from "./document";
 
-export interface ParsedBook {
-  id: string;
-  bookId: string;
-  chapters: Chapter[];
-  totalWords: number;
-  metadata?: Record<string, any>;
-}
-
-export interface ReadingProgress {
-  userId?: string; // Optional if guest
-  bookId: string;
-  currentChapterIndex: number;
-  currentWordIndex: number;
-  readingTime: number; // in seconds
-  lastOpened: string; // ISO string
-}
 
 export interface Settings {
   defaultWPM: number;
