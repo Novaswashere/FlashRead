@@ -3,7 +3,10 @@ import { IDocumentParser, ParseOptions } from "./contract";
 import { ParserError, EmptyDocumentError } from "../../lib/errors";
 
 export class TxtParser implements IDocumentParser {
-  async parse(data: File | string, options?: ParseOptions): Promise<ParsedBook> {
+  async parse(
+    data: File | string,
+    options?: ParseOptions
+  ): Promise<ParsedBook> {
     const signal = options?.signal;
     const onProgress = options?.onProgress;
 

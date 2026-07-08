@@ -17,7 +17,9 @@ export default function LibraryPage() {
   const { books, isLoading, removeBook } = useLibraryContext();
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
-  const [progressMap, setProgressMap] = useState<Record<string, ProgressType>>({});
+  const [progressMap, setProgressMap] = useState<Record<string, ProgressType>>(
+    {}
+  );
 
   useEffect(() => {
     async function loadProgress() {
@@ -42,7 +44,11 @@ export default function LibraryPage() {
 
   const handleMoreActions = (book: Book, e: React.MouseEvent) => {
     e.preventDefault();
-    if (confirm(`Are you sure you want to delete "${book.title}" from your library?`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete "${book.title}" from your library?`
+      )
+    ) {
       removeBook(book.id);
     }
   };

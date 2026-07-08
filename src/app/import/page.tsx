@@ -11,7 +11,14 @@ import { parserService } from "@/services/parser";
 import { storageService } from "@/services/storage";
 import { ParsedBook, Book, ReadingProgress } from "@/types";
 import { ParserError } from "@/lib/errors";
-import { Loader2, AlertTriangle, FileText, Check, X, ShieldAlert } from "lucide-react";
+import {
+  Loader2,
+  AlertTriangle,
+  FileText,
+  Check,
+  X,
+  ShieldAlert,
+} from "lucide-react";
 
 type ImportState = "IDLE" | "PARSING" | "PREVIEW" | "SAVING" | "ERROR";
 
@@ -29,14 +36,18 @@ export default function ImportPage() {
   const [parsedBook, setParsedBook] = useState<ParsedBook | null>(null);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedAuthor, setEditedAuthor] = useState("");
-  const [fileFormat, setFileFormat] = useState<"epub" | "pdf" | "txt" | "pasted">("txt");
+  const [fileFormat, setFileFormat] = useState<
+    "epub" | "pdf" | "txt" | "pasted"
+  >("txt");
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
 
   // Ingestion Controllers
   const abortControllerRef = useRef<AbortController | null>(null);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
-  const [toastType, setToastType] = useState<"success" | "error" | "info">("info");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "info"
+  );
 
   // Cleanup Object URLs on unmount
   useEffect(() => {
@@ -47,7 +58,10 @@ export default function ImportPage() {
     };
   }, [coverPreviewUrl]);
 
-  const handleStartParsing = async (data: File | string, format: "epub" | "pdf" | "txt" | "pasted") => {
+  const handleStartParsing = async (
+    data: File | string,
+    format: "epub" | "pdf" | "txt" | "pasted"
+  ) => {
     setState("PARSING");
     setProgress(0);
     setFileFormat(format);
@@ -79,7 +93,9 @@ export default function ImportPage() {
 
       // Setup cover preview
       if (result.metadata.coverAssetId && result.assets) {
-        const coverAsset = result.assets.find((a) => a.id === result.metadata.coverAssetId);
+        const coverAsset = result.assets.find(
+          (a) => a.id === result.metadata.coverAssetId
+        );
         if (coverAsset) {
           const previewUrl = window.URL.createObjectURL(coverAsset.data);
           setCoverPreviewUrl(previewUrl);
@@ -98,7 +114,9 @@ export default function ImportPage() {
 
       console.error("Parser Ingestion Error:", err);
       setErrorType(err.code || "UNKNOWN_ERROR");
-      setErrorMessage(err.message || "An unexpected error occurred during document parsing.");
+      setErrorMessage(
+        err.message || "An unexpected error occurred during document parsing."
+      );
       setState("ERROR");
     }
   };
@@ -196,7 +214,6 @@ export default function ImportPage() {
   return (
     <main className="pt-24 pb-20 md:pb-8 md:pl-72 px-space-md max-w-container-max mx-auto min-h-screen text-left bg-zinc-950 text-zinc-100">
       <div className="max-w-[800px] mx-auto">
-        
         {/* IDLE STATE */}
         {state === "IDLE" && (
           <>
@@ -205,7 +222,8 @@ export default function ImportPage() {
                 Import New Content
               </h2>
               <p className="text-zinc-400 font-body-md">
-                Add documents or raw text to your library to start speed reading.
+                Add documents or raw text to your library to start speed
+                reading.
               </p>
             </div>
 
@@ -219,14 +237,20 @@ export default function ImportPage() {
         {/* PARSING STATE */}
         {state === "PARSING" && (
           <div className="backdrop-blur-md bg-zinc-900/60 border border-zinc-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[350px] shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 h-1 bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-300" style={{ width: `${progress}%` }} />
-            
+            <div
+              className="absolute top-0 left-0 h-1 bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+
             <Loader2 className="h-12 w-12 text-cyan-500 animate-spin mb-6" />
             <h3 className="text-xl font-semibold mb-2">Ingesting Document</h3>
             <p className="text-zinc-400 text-sm mb-6">{statusText}</p>
-            
+
             <div className="w-full max-w-md bg-zinc-800 rounded-full h-2.5 mb-8 overflow-hidden">
-              <div className="bg-cyan-500 h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+              <div
+                className="bg-cyan-500 h-2.5 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
             </div>
 
             <button
@@ -243,7 +267,9 @@ export default function ImportPage() {
           <div className="backdrop-blur-md bg-zinc-900/60 border border-zinc-800 rounded-2xl p-8 shadow-2xl">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
               <FileText className="h-6 w-6 text-cyan-400" />
-              <h3 className="text-xl font-semibold text-zinc-100">Document Preview</h3>
+              <h3 className="text-xl font-semibold text-zinc-100">
+                Document Preview
+              </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
@@ -266,7 +292,9 @@ export default function ImportPage() {
               {/* Editing Column */}
               <div className="md:col-span-2 space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Book Title</label>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                    Book Title
+                  </label>
                   <input
                     type="text"
                     value={editedTitle}
@@ -277,7 +305,9 @@ export default function ImportPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Author</label>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                    Author
+                  </label>
                   <input
                     type="text"
                     value={editedAuthor}
@@ -289,12 +319,20 @@ export default function ImportPage() {
 
                 <div className="grid grid-cols-2 gap-4 pt-2">
                   <div className="bg-zinc-950/60 border border-zinc-850 p-3 rounded-lg text-center">
-                    <div className="text-zinc-500 text-xs uppercase font-medium">Chapters</div>
-                    <div className="text-lg font-bold text-zinc-200">{parsedBook.chapters.length}</div>
+                    <div className="text-zinc-500 text-xs uppercase font-medium">
+                      Chapters
+                    </div>
+                    <div className="text-lg font-bold text-zinc-200">
+                      {parsedBook.chapters.length}
+                    </div>
                   </div>
                   <div className="bg-zinc-950/60 border border-zinc-850 p-3 rounded-lg text-center">
-                    <div className="text-zinc-500 text-xs uppercase font-medium">Word Count</div>
-                    <div className="text-lg font-bold text-zinc-200">{parsedBook.totalWords.toLocaleString()}</div>
+                    <div className="text-zinc-500 text-xs uppercase font-medium">
+                      Word Count
+                    </div>
+                    <div className="text-lg font-bold text-zinc-200">
+                      {parsedBook.totalWords.toLocaleString()}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -322,7 +360,9 @@ export default function ImportPage() {
           <div className="backdrop-blur-md bg-zinc-900/60 border border-zinc-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px] shadow-2xl">
             <Loader2 className="h-12 w-12 text-emerald-500 animate-spin mb-6" />
             <h3 className="text-xl font-semibold mb-2">Saving to Library</h3>
-            <p className="text-zinc-400 text-sm">Persisting document indices to local IndexedDB...</p>
+            <p className="text-zinc-400 text-sm">
+              Persisting document indices to local IndexedDB...
+            </p>
           </div>
         )}
 
@@ -332,8 +372,12 @@ export default function ImportPage() {
             <div className="flex items-center gap-3 text-red-500 mb-6 pb-4 border-b border-zinc-800">
               <ShieldAlert className="h-8 w-8 text-red-500" />
               <div>
-                <h3 className="text-xl font-semibold text-zinc-100">Parser Exception</h3>
-                <span className="text-xs text-red-400 uppercase tracking-wider font-semibold font-mono">{errorType}</span>
+                <h3 className="text-xl font-semibold text-zinc-100">
+                  Parser Exception
+                </h3>
+                <span className="text-xs text-red-400 uppercase tracking-wider font-semibold font-mono">
+                  {errorType}
+                </span>
               </div>
             </div>
 
@@ -357,7 +401,6 @@ export default function ImportPage() {
             </div>
           </div>
         )}
-
       </div>
 
       <Toast

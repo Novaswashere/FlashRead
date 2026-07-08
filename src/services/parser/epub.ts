@@ -1,10 +1,17 @@
 import JSZip from "jszip";
 import { ParsedBook, Chapter, Block, ImageAsset } from "../../types";
 import { IDocumentParser, ParseOptions } from "./contract";
-import { ParserError, InvalidEpubError, CorruptedFileError } from "../../lib/errors";
+import {
+  ParserError,
+  InvalidEpubError,
+  CorruptedFileError,
+} from "../../lib/errors";
 
 export class EpubParser implements IDocumentParser {
-  async parse(data: File | string, options?: ParseOptions): Promise<ParsedBook> {
+  async parse(
+    data: File | string,
+    options?: ParseOptions
+  ): Promise<ParsedBook> {
     const signal = options?.signal;
     const onProgress = options?.onProgress;
 
@@ -13,7 +20,10 @@ export class EpubParser implements IDocumentParser {
     }
 
     if (typeof data === "string") {
-      throw new ParserError("EPUB parser expects a binary file, not a string", "INVALID_INPUT");
+      throw new ParserError(
+        "EPUB parser expects a binary file, not a string",
+        "INVALID_INPUT"
+      );
     }
 
     onProgress?.(5);
@@ -22,7 +32,9 @@ export class EpubParser implements IDocumentParser {
     try {
       zip = await JSZip.loadAsync(data);
     } catch (err: any) {
-      throw new CorruptedFileError(`Failed to read EPUB file zip structure: ${err?.message || err}`);
+      throw new CorruptedFileError(
+        `Failed to read EPUB file zip structure: ${err?.message || err}`
+      );
     }
 
     if (signal?.aborted) {
@@ -34,7 +46,9 @@ export class EpubParser implements IDocumentParser {
     // 1. Read container.xml to find OPF path
     const containerFile = zip.file("META-INF/container.xml");
     if (!containerFile) {
-      throw new InvalidEpubError("Missing META-INF/container.xml in EPUB archive");
+      throw new InvalidEpubError(
+        "Missing META-INF/container.xml in EPUB archive"
+      );
     }
 
     const containerText = await containerFile.async("text");
@@ -44,7 +58,9 @@ export class EpubParser implements IDocumentParser {
     const opfPath = rootfile?.getAttribute("full-path");
 
     if (!opfPath) {
-      throw new InvalidEpubError("Rootfile full-path attribute not found in container.xml");
+      throw new InvalidEpubError(
+        "Rootfile full-path attribute not found in container.xml"
+      );
     }
 
     if (signal?.aborted) {
@@ -56,14 +72,18 @@ export class EpubParser implements IDocumentParser {
     // 2. Read OPF file contents
     const opfFile = zip.file(opfPath);
     if (!opfFile) {
-      throw new InvalidEpubError(`OPF metadata file not found at path: ${opfPath}`);
+      throw new InvalidEpubError(
+        `OPF metadata file not found at path: ${opfPath}`
+      );
     }
 
     const opfText = await opfFile.async("text");
     const opfDoc = parser.parseFromString(opfText, "text/xml");
 
     // Helper for relative path resolution
-    const opfDir = opfPath.includes("/") ? opfPath.substring(0, opfPath.lastIndexOf("/")) : "";
+    const opfDir = opfPath.includes("/")
+      ? opfPath.substring(0, opfPath.lastIndexOf("/"))
+      : "";
     const resolvePath = (relative: string) => {
       if (!opfDir) return relative;
       const parts = (opfDir + "/" + relative).split("/");
@@ -77,24 +97,30 @@ export class EpubParser implements IDocumentParser {
     };
 
     // 3. Extract metadata
-    const title = opfDoc.getElementsByTagName("dc:title")[0]?.textContent ||
-                  opfDoc.getElementsByTagName("title")[0]?.textContent ||
-                  data.name.replace(/\.[^/.]+$/, "");
-    const author = opfDoc.getElementsByTagName("dc:creator")[0]?.textContent ||
-                   opfDoc.getElementsByTagName("creator")[0]?.textContent ||
-                   "Unknown Author";
-    const language = opfDoc.getElementsByTagName("dc:language")[0]?.textContent ||
-                     opfDoc.getElementsByTagName("language")[0]?.textContent ||
-                     "en";
-    const description = opfDoc.getElementsByTagName("dc:description")[0]?.textContent ||
-                        opfDoc.getElementsByTagName("description")[0]?.textContent ||
-                        "";
-    const publisher = opfDoc.getElementsByTagName("dc:publisher")[0]?.textContent ||
-                      opfDoc.getElementsByTagName("publisher")[0]?.textContent ||
-                      "";
-    const publicationDate = opfDoc.getElementsByTagName("dc:date")[0]?.textContent ||
-                            opfDoc.getElementsByTagName("date")[0]?.textContent ||
-                            "";
+    const title =
+      opfDoc.getElementsByTagName("dc:title")[0]?.textContent ||
+      opfDoc.getElementsByTagName("title")[0]?.textContent ||
+      data.name.replace(/\.[^/.]+$/, "");
+    const author =
+      opfDoc.getElementsByTagName("dc:creator")[0]?.textContent ||
+      opfDoc.getElementsByTagName("creator")[0]?.textContent ||
+      "Unknown Author";
+    const language =
+      opfDoc.getElementsByTagName("dc:language")[0]?.textContent ||
+      opfDoc.getElementsByTagName("language")[0]?.textContent ||
+      "en";
+    const description =
+      opfDoc.getElementsByTagName("dc:description")[0]?.textContent ||
+      opfDoc.getElementsByTagName("description")[0]?.textContent ||
+      "";
+    const publisher =
+      opfDoc.getElementsByTagName("dc:publisher")[0]?.textContent ||
+      opfDoc.getElementsByTagName("publisher")[0]?.textContent ||
+      "";
+    const publicationDate =
+      opfDoc.getElementsByTagName("dc:date")[0]?.textContent ||
+      opfDoc.getElementsByTagName("date")[0]?.textContent ||
+      "";
 
     // 4. Map manifest and spine
     const manifestItems = opfDoc.getElementsByTagName("item");
@@ -135,12 +161,18 @@ export class EpubParser implements IDocumentParser {
       const ext = path.substring(path.lastIndexOf(".")).toLowerCase();
       switch (ext) {
         case ".jpg":
-        case ".jpeg": return "image/jpeg";
-        case ".png": return "image/png";
-        case ".gif": return "image/gif";
-        case ".svg": return "image/svg+xml";
-        case ".webp": return "image/webp";
-        default: return "application/octet-stream";
+        case ".jpeg":
+          return "image/jpeg";
+        case ".png":
+          return "image/png";
+        case ".gif":
+          return "image/gif";
+        case ".svg":
+          return "image/svg+xml";
+        case ".webp":
+          return "image/webp";
+        default:
+          return "application/octet-stream";
       }
     };
 
@@ -270,7 +302,10 @@ export class EpubParser implements IDocumentParser {
                   id: `img-block-${Math.random().toString(36).substring(2, 9)}`,
                   type: "image",
                   assetId,
-                  caption: el.getAttribute("title") || el.getAttribute("alt") || undefined,
+                  caption:
+                    el.getAttribute("title") ||
+                    el.getAttribute("alt") ||
+                    undefined,
                   altText: el.getAttribute("alt") || undefined,
                   originalPosition: blocks.length,
                 });

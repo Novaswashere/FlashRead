@@ -17,7 +17,6 @@ export interface Book {
 
 export * from "./document";
 
-
 export interface Settings {
   defaultWPM: number;
   theme: "light" | "dark" | "sepia" | "system";

@@ -44,5 +44,5 @@ export const bookRepository = {
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
-  }
+  },
 };

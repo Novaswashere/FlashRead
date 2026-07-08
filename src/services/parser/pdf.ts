@@ -1,10 +1,18 @@
 import { ParsedBook, Chapter, ParagraphBlock } from "../../types";
 import { IDocumentParser, ParseOptions } from "./contract";
-import { ParserError, EncryptedPdfError, EmptyDocumentError, CorruptedFileError } from "../../lib/errors";
+import {
+  ParserError,
+  EncryptedPdfError,
+  EmptyDocumentError,
+  CorruptedFileError,
+} from "../../lib/errors";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 
 export class PdfParser implements IDocumentParser {
-  async parse(data: File | string, options?: ParseOptions): Promise<ParsedBook> {
+  async parse(
+    data: File | string,
+    options?: ParseOptions
+  ): Promise<ParsedBook> {
     const signal = options?.signal;
     const onProgress = options?.onProgress;
 
@@ -13,14 +21,17 @@ export class PdfParser implements IDocumentParser {
     }
 
     if (typeof data === "string") {
-      throw new ParserError("PDF parser expects a binary File, not a string", "INVALID_INPUT");
+      throw new ParserError(
+        "PDF parser expects a binary File, not a string",
+        "INVALID_INPUT"
+      );
     }
 
     onProgress?.(5);
 
     // Dynamic import to bypass Next.js SSR prerendering environment errors
     const pdfjs = await import("pdfjs-dist");
-    
+
     if (typeof window !== "undefined") {
       pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
     }
@@ -29,7 +40,9 @@ export class PdfParser implements IDocumentParser {
     try {
       arrayBuffer = await data.arrayBuffer();
     } catch (err: any) {
-      throw new CorruptedFileError(`Failed to read PDF file binary data: ${err?.message || err}`);
+      throw new CorruptedFileError(
+        `Failed to read PDF file binary data: ${err?.message || err}`
+      );
     }
 
     if (signal?.aborted) {
@@ -40,7 +53,9 @@ export class PdfParser implements IDocumentParser {
 
     let pdfDoc: PDFDocumentProxy;
     try {
-      const loadingTask = pdfjs.getDocument({ data: new Uint8Array(arrayBuffer) });
+      const loadingTask = pdfjs.getDocument({
+        data: new Uint8Array(arrayBuffer),
+      });
 
       if (signal) {
         signal.addEventListener("abort", () => {
@@ -51,9 +66,13 @@ export class PdfParser implements IDocumentParser {
       pdfDoc = await loadingTask.promise;
     } catch (err: any) {
       if (err?.name === "PasswordException") {
-        throw new EncryptedPdfError("This PDF document is encrypted or password protected");
+        throw new EncryptedPdfError(
+          "This PDF document is encrypted or password protected"
+        );
       }
-      throw new CorruptedFileError(`Failed to load PDF document: ${err?.message || err}`);
+      throw new CorruptedFileError(
+        `Failed to load PDF document: ${err?.message || err}`
+      );
     }
 
     if (signal?.aborted) {
@@ -84,7 +103,9 @@ export class PdfParser implements IDocumentParser {
         const textContent = await page.getTextContent();
 
         // Filter text items
-        const textItems = textContent.items.filter((item: any) => typeof item.str === "string");
+        const textItems = textContent.items.filter(
+          (item: any) => typeof item.str === "string"
+        );
         if (textItems.length === 0) continue;
 
         // Sort items vertically (y coordinate descending) and horizontally (x coordinate ascending)
@@ -167,7 +188,9 @@ export class PdfParser implements IDocumentParser {
     }
 
     if (blocks.length === 0) {
-      throw new EmptyDocumentError("The PDF document contains no readable text content (it may be a scanned PDF image)");
+      throw new EmptyDocumentError(
+        "The PDF document contains no readable text content (it may be a scanned PDF image)"
+      );
     }
 
     const chapterId = `chap-${Math.random().toString(36).substring(2, 9)}`;

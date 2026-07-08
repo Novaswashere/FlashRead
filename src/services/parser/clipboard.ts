@@ -3,7 +3,10 @@ import { IDocumentParser, ParseOptions } from "./contract";
 import { ParserError, EmptyDocumentError } from "../../lib/errors";
 
 export class ClipboardParser implements IDocumentParser {
-  async parse(data: File | string, options?: ParseOptions): Promise<ParsedBook> {
+  async parse(
+    data: File | string,
+    options?: ParseOptions
+  ): Promise<ParsedBook> {
     const signal = options?.signal;
     const onProgress = options?.onProgress;
 
@@ -27,7 +30,9 @@ export class ClipboardParser implements IDocumentParser {
       .filter(Boolean);
 
     if (paragraphTexts.length === 0) {
-      throw new EmptyDocumentError("Pasted clipboard text contains no valid paragraphs");
+      throw new EmptyDocumentError(
+        "Pasted clipboard text contains no valid paragraphs"
+      );
     }
 
     onProgress?.(70);

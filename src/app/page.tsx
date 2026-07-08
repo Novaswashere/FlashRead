@@ -17,8 +17,12 @@ export default function HomePage() {
   const { books, isLoading } = useLibraryContext();
 
   const [activeBook, setActiveBook] = useState<Book | null>(null);
-  const [activeProgress, setActiveProgress] = useState<ProgressType | null>(null);
-  const [progressMap, setProgressMap] = useState<Record<string, ProgressType>>({});
+  const [activeProgress, setActiveProgress] = useState<ProgressType | null>(
+    null
+  );
+  const [progressMap, setProgressMap] = useState<Record<string, ProgressType>>(
+    {}
+  );
   const [recentBooks, setRecentBooks] = useState<Book[]>([]);
 
   useEffect(() => {

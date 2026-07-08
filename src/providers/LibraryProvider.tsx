@@ -15,7 +15,9 @@ interface LibraryContextProps {
   refreshLibrary: () => Promise<void>;
 }
 
-const LibraryContext = createContext<LibraryContextProps | undefined>(undefined);
+const LibraryContext = createContext<LibraryContextProps | undefined>(
+  undefined
+);
 
 export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -27,12 +29,12 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setIsLoading(true);
       let list = await storageService.books.getAll();
-      
+
       // If first run and IndexedDB is empty, seed mock books
       if (list.length === 0) {
         for (const b of MOCK_BOOKS) {
           await storageService.books.save(b);
-          
+
           // Seed progress
           const prog = MOCK_PROGRESS[b.id] || {
             bookId: b.id,
@@ -60,11 +62,11 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({
                     id: `${b.id}-para-1`,
                     type: "paragraph",
                     text: MOCK_READER_TEXT,
-                  }
+                  },
                 ],
                 content: MOCK_READER_TEXT,
                 wordCount: MOCK_READER_TEXT.split(/\s+/).filter(Boolean).length,
-              }
+              },
             ],
             totalWords: MOCK_READER_TEXT.split(/\s+/).filter(Boolean).length,
             metadata: {
@@ -74,7 +76,7 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({
           };
           await storageService.parsedBooks.save(parsed);
         }
-        
+
         list = await storageService.books.getAll();
       }
 
@@ -101,11 +103,11 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({
       await storageService.books.delete(id);
       await storageService.parsedBooks.delete(id);
       await storageService.progress.delete(id);
-      
+
       // Revoke any cover URL assets
       storageService.assets.revokeAssetUrl(id);
       await storageService.assets.deleteAsset(id);
-      
+
       await refreshLibrary();
     } catch (err) {
       console.error("Failed to remove book:", err);

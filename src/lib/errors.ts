@@ -1,5 +1,8 @@
 export class ParserError extends Error {
-  constructor(message: string, public code: string) {
+  constructor(
+    message: string,
+    public code: string
+  ) {
     super(message);
     this.name = "ParserError";
     Object.setPrototypeOf(this, new.target.prototype);

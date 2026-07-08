@@ -14,7 +14,15 @@ import { SpeedControl } from "@/features/reader/components/SpeedControl";
 import { KeyboardShortcutsHelp } from "@/features/reader/components/KeyboardShortcutsHelp";
 import { storageService } from "@/services/storage";
 import { Book, ParsedBook, ReadingProgress as ProgressType } from "@/types";
-import { Loader2, ArrowLeft, ArrowRight, Play, Trophy, RefreshCw, Library } from "lucide-react";
+import {
+  Loader2,
+  ArrowLeft,
+  ArrowRight,
+  Play,
+  Trophy,
+  RefreshCw,
+  Library,
+} from "lucide-react";
 
 /**
  * PlayTimeTracker — records reading time in seconds while RSVP is active
@@ -136,7 +144,6 @@ function ReaderInner({
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col items-center justify-center relative md:pl-64 pt-16">
-      
       {/* Play time logger */}
       <PlayTimeTracker bookId={book.id} />
 
@@ -186,31 +193,42 @@ function ReaderInner({
         {isChapterFinished && (
           <div className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md flex items-center justify-center z-50 p-6">
             <div className="max-w-[450px] w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center shadow-2xl animate-in fade-in zoom-in duration-300">
-              
               {hasNextChapter ? (
                 <>
                   <div className="h-14 w-14 bg-cyan-950 border border-cyan-800 rounded-full flex items-center justify-center mx-auto mb-6 text-cyan-400 animate-bounce">
                     <Trophy className="h-6 w-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-zinc-100 mb-2">Chapter Completed!</h3>
+                  <h3 className="text-xl font-bold text-zinc-100 mb-2">
+                    Chapter Completed!
+                  </h3>
                   <p className="text-zinc-400 text-sm mb-6">
-                    You read {snapshot.totalWords} words at {snapshot.wpm} WPM. Excellent speed reading.
+                    You read {snapshot.totalWords} words at {snapshot.wpm} WPM.
+                    Excellent speed reading.
                   </p>
 
                   <div className="bg-zinc-950 border border-zinc-850 rounded-xl p-5 mb-6 text-left">
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-cyan-500 block mb-1">Up Next</span>
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-cyan-500 block mb-1">
+                      Up Next
+                    </span>
                     <div className="font-medium text-zinc-200 line-clamp-1">
-                      {parsedBook.chapters[currentChapterIndex + 1]?.title || `Chapter ${currentChapterIndex + 2}`}
+                      {parsedBook.chapters[currentChapterIndex + 1]?.title ||
+                        `Chapter ${currentChapterIndex + 2}`}
                     </div>
                   </div>
 
                   {!isAutoplayPaused ? (
                     <div className="text-xs text-zinc-500 mb-6 flex items-center justify-center gap-1.5">
                       <span className="inline-block h-2 w-2 rounded-full bg-cyan-500 animate-ping" />
-                      Auto-advancing in <span className="font-bold text-zinc-300">{autoplaySeconds}s</span>...
+                      Auto-advancing in{" "}
+                      <span className="font-bold text-zinc-300">
+                        {autoplaySeconds}s
+                      </span>
+                      ...
                     </div>
                   ) : (
-                    <div className="text-xs text-zinc-500 mb-6">Autoplay paused</div>
+                    <div className="text-xs text-zinc-500 mb-6">
+                      Autoplay paused
+                    </div>
                   )}
 
                   <div className="flex gap-4">
@@ -233,9 +251,15 @@ function ReaderInner({
                   <div className="h-16 w-16 bg-gradient-to-tr from-yellow-500 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-950 animate-pulse shadow-lg shadow-yellow-950/20">
                     <Trophy className="h-8 w-8" />
                   </div>
-                  <h3 className="text-2xl font-bold text-zinc-100 mb-2">Book Finished!</h3>
+                  <h3 className="text-2xl font-bold text-zinc-100 mb-2">
+                    Book Finished!
+                  </h3>
                   <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
-                    Congratulations! You have successfully completed reading <span className="text-zinc-200 font-semibold">&ldquo;{book.title}&rdquo;</span>.
+                    Congratulations! You have successfully completed reading{" "}
+                    <span className="text-zinc-200 font-semibold">
+                      &ldquo;{book.title}&rdquo;
+                    </span>
+                    .
                   </p>
 
                   <div className="flex flex-col gap-3">
@@ -254,7 +278,6 @@ function ReaderInner({
                   </div>
                 </>
               )}
-
             </div>
           </div>
         )}
@@ -411,7 +434,9 @@ function ReaderLoader() {
       const currentProgressRatio = currentWordIndex / chapterWords;
       const pct = Math.min(
         100,
-        Math.round(((currentChapterIndex + currentProgressRatio) / totalChapters) * 100)
+        Math.round(
+          ((currentChapterIndex + currentProgressRatio) / totalChapters) * 100
+        )
       );
 
       const progressUpdate: ProgressType = {
@@ -432,7 +457,14 @@ function ReaderLoader() {
 
     const handler = setTimeout(saveProgress, 1500);
     return () => clearTimeout(handler);
-  }, [currentWordIndex, currentWpm, currentChapterIndex, bookId, parsedBook, isLoading]);
+  }, [
+    currentWordIndex,
+    currentWpm,
+    currentChapterIndex,
+    bookId,
+    parsedBook,
+    isLoading,
+  ]);
 
   if (isLoading) {
     return (
@@ -447,8 +479,12 @@ function ReaderLoader() {
     return (
       <div className="bg-zinc-950 min-h-screen text-zinc-100 flex flex-col items-center justify-center p-6 text-center">
         <div className="max-w-[400px] bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-xl">
-          <h3 className="text-lg font-bold text-red-500 mb-2">Error Loading Book</h3>
-          <p className="text-zinc-400 text-sm mb-6">{error || "Could not initialize document state."}</p>
+          <h3 className="text-lg font-bold text-red-500 mb-2">
+            Error Loading Book
+          </h3>
+          <p className="text-zinc-400 text-sm mb-6">
+            {error || "Could not initialize document state."}
+          </p>
           <button
             onClick={() => router.push("/")}
             className="w-full px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-semibold rounded-lg border border-zinc-750 transition"
@@ -460,7 +496,8 @@ function ReaderLoader() {
     );
   }
 
-  const currentChapter = parsedBook.chapters[currentChapterIndex] || parsedBook.chapters[0];
+  const currentChapter =
+    parsedBook.chapters[currentChapterIndex] || parsedBook.chapters[0];
 
   return (
     /* We change the key whenever the chapter changes so that the RSVP engine unmounts and remounts cleanly */
@@ -494,7 +531,9 @@ export default function ReaderPage() {
       fallback={
         <div className="bg-zinc-950 min-h-screen text-zinc-100 flex flex-col items-center justify-center">
           <Loader2 className="h-10 w-10 text-cyan-500 animate-spin mb-4" />
-          <span className="text-zinc-400 text-sm font-medium">Booting engine...</span>
+          <span className="text-zinc-400 text-sm font-medium">
+            Booting engine...
+          </span>
         </div>
       }
     >

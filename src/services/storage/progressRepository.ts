@@ -33,5 +33,5 @@ export const progressRepository = {
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
-  }
+  },
 };

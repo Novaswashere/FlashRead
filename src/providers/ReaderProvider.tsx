@@ -34,7 +34,11 @@ export const ReaderProvider: React.FC<{
   // Handle initial seek on mount
   const initialSeekDone = useRef(false);
   useEffect(() => {
-    if (!initialSeekDone.current && initialWordIndex > 0 && snapshot.totalWords > 0) {
+    if (
+      !initialSeekDone.current &&
+      initialWordIndex > 0 &&
+      snapshot.totalWords > 0
+    ) {
       actions.seek(initialWordIndex);
       initialSeekDone.current = true;
     }

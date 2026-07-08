@@ -21,7 +21,9 @@ export class ParserRegistry {
     const ext = filename.substring(filename.lastIndexOf(".")).toLowerCase();
     const parser = this.parsers.get(ext);
     if (!parser) {
-      throw new UnsupportedFormatError(`No parser registered for file: ${filename}`);
+      throw new UnsupportedFormatError(
+        `No parser registered for file: ${filename}`
+      );
     }
     return parser;
   }
@@ -46,15 +48,19 @@ parserRegistry.register(".txt", txtParser);
 parserRegistry.register("text/plain", txtParser);
 
 export class ParserService {
-  async parse(data: File | string, title?: string, options?: ParseOptions): Promise<ParsedBook> {
+  async parse(
+    data: File | string,
+    title?: string,
+    options?: ParseOptions
+  ): Promise<ParsedBook> {
     if (typeof data === "string") {
       // For clipboard content, we pass the title via options or default to a string
       const clipOptions = {
         ...options,
         metadata: {
           title: title || "Pasted Content",
-          ...(options?.metadata || {})
-        }
+          ...(options?.metadata || {}),
+        },
       };
       return clipboardParser.parse(data, clipOptions);
     }
