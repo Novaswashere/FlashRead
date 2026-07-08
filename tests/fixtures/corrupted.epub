@@ -1,0 +1,1 @@
+This is not zip format data so JSZip should fail to parse it.

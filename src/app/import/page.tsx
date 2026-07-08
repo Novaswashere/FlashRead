@@ -9,6 +9,7 @@ import { SupportedFormatsCard } from "@/features/import/components/SupportedForm
 import { Toast } from "@/components/ui/Toast";
 import { parserService } from "@/services/parser";
 import { storageService } from "@/services/storage";
+import { useLibraryContext } from "@/providers/LibraryProvider";
 import { ParsedBook, Book, ReadingProgress } from "@/types";
 import { ParserError } from "@/lib/errors";
 import {
@@ -24,6 +25,7 @@ type ImportState = "IDLE" | "PARSING" | "PREVIEW" | "SAVING" | "ERROR";
 
 export default function ImportPage() {
   const router = useRouter();
+  const { addBook } = useLibraryContext();
 
   // State Machine
   const [state, setState] = useState<ImportState>("IDLE");
@@ -43,6 +45,8 @@ export default function ImportPage() {
 
   // Ingestion Controllers
   const abortControllerRef = useRef<AbortController | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [acceptFilter, setAcceptFilter] = useState(".epub,.pdf,.txt");
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState<"success" | "error" | "info">(
@@ -135,6 +139,41 @@ export default function ImportPage() {
     handleStartParsing(text, "pasted");
   };
 
+  const handleFormatSelect = (label: string) => {
+    if (label === "Upload EPUB") {
+      setAcceptFilter(".epub");
+      setTimeout(() => fileInputRef.current?.click(), 0);
+    } else if (label === "Upload PDF") {
+      setAcceptFilter(".pdf");
+      setTimeout(() => fileInputRef.current?.click(), 0);
+    } else if (label === "Upload TXT") {
+      setAcceptFilter(".txt");
+      setTimeout(() => fileInputRef.current?.click(), 0);
+    } else if (label === "Paste Text") {
+      const el = document.getElementById("paste-section");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+        const textarea = el.querySelector("textarea");
+        if (textarea) {
+          textarea.focus();
+        }
+      }
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      let format: "epub" | "pdf" | "txt" | "pasted" = "txt";
+      const nameLower = file.name.toLowerCase();
+      if (nameLower.endsWith(".epub")) format = "epub";
+      else if (nameLower.endsWith(".pdf")) format = "pdf";
+      else if (nameLower.endsWith(".txt")) format = "txt";
+      handleStartParsing(file, format);
+      e.target.value = "";
+    }
+  };
+
   const handleAbort = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -169,7 +208,7 @@ export default function ImportPage() {
       parsedBook.metadata.author = newBook.author;
 
       // 3. Save records using Storage Facade
-      await storageService.books.save(newBook);
+      await addBook(newBook);
       await storageService.parsedBooks.save(parsedBook);
 
       // 4. Initialize Reading Progress
@@ -212,22 +251,29 @@ export default function ImportPage() {
   };
 
   return (
-    <main className="pt-24 pb-20 md:pb-8 md:pl-72 px-space-md max-w-container-max mx-auto min-h-screen text-left bg-zinc-950 text-zinc-100">
+    <main className="pt-24 pb-20 md:pb-8 md:pl-72 px-space-md max-w-container-max mx-auto min-h-screen text-left bg-background text-on-background">
       <div className="max-w-[800px] mx-auto">
         {/* IDLE STATE */}
         {state === "IDLE" && (
           <>
             <div className="mb-space-xl">
-              <h2 className="font-headline-lg text-headline-lg text-zinc-100 mb-2">
+              <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2">
                 Import New Content
               </h2>
-              <p className="text-zinc-400 font-body-md">
+              <p className="text-on-surface-variant font-body-md">
                 Add documents or raw text to your library to start speed
                 reading.
               </p>
             </div>
 
-            <SupportedFormatsCard onFormatSelect={(lbl) => {}} />
+            <SupportedFormatsCard onFormatSelect={handleFormatSelect} />
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept={acceptFilter}
+              className="hidden"
+              onChange={handleFileChange}
+            />
             <UploadDropzone onFileDrop={handleFileDrop} isProcessing={false} />
             <PasteTextCard onPasteText={handlePasteText} />
             <ImportHelpSection />
@@ -264,17 +310,17 @@ export default function ImportPage() {
 
         {/* PREVIEW STATE */}
         {state === "PREVIEW" && parsedBook && (
-          <div className="backdrop-blur-md bg-zinc-900/60 border border-zinc-800 rounded-2xl p-8 shadow-2xl">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
-              <FileText className="h-6 w-6 text-cyan-400" />
-              <h3 className="text-xl font-semibold text-zinc-100">
+          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 shadow-2xl">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border-subtle">
+              <FileText className="h-6 w-6 text-primary" />
+              <h3 className="text-xl font-semibold text-on-surface">
                 Document Preview
               </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               {/* Cover Column */}
-              <div className="md:col-span-1 flex flex-col items-center justify-center bg-zinc-950/60 border border-zinc-800 rounded-xl p-4 min-h-[220px]">
+              <div className="md:col-span-1 flex flex-col items-center justify-center bg-surface-container-lowest/60 border border-border-subtle rounded-xl p-4 min-h-[220px]">
                 {coverPreviewUrl ? (
                   <img
                     src={coverPreviewUrl}
@@ -299,7 +345,7 @@ export default function ImportPage() {
                     type="text"
                     value={editedTitle}
                     onChange={(e) => setEditedTitle(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-zinc-100 placeholder-zinc-600 transition outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg bg-surface-container-lowest border border-border-subtle focus:border-primary focus:ring-1 focus:ring-primary text-on-surface placeholder-zinc-600 transition outline-none"
                     placeholder="Enter book title"
                   />
                 </div>
@@ -312,25 +358,25 @@ export default function ImportPage() {
                     type="text"
                     value={editedAuthor}
                     onChange={(e) => setEditedAuthor(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-zinc-100 placeholder-zinc-600 transition outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg bg-surface-container-lowest border border-border-subtle focus:border-primary focus:ring-1 focus:ring-primary text-on-surface placeholder-zinc-600 transition outline-none"
                     placeholder="Enter author name"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="bg-zinc-950/60 border border-zinc-850 p-3 rounded-lg text-center">
+                  <div className="bg-surface-container-lowest/60 border border-border-subtle p-3 rounded-lg text-center">
                     <div className="text-zinc-500 text-xs uppercase font-medium">
                       Chapters
                     </div>
-                    <div className="text-lg font-bold text-zinc-200">
+                    <div className="text-lg font-bold text-on-surface">
                       {parsedBook.chapters.length}
                     </div>
                   </div>
-                  <div className="bg-zinc-950/60 border border-zinc-850 p-3 rounded-lg text-center">
+                  <div className="bg-surface-container-lowest/60 border border-border-subtle p-3 rounded-lg text-center">
                     <div className="text-zinc-500 text-xs uppercase font-medium">
                       Word Count
                     </div>
-                    <div className="text-lg font-bold text-zinc-200">
+                    <div className="text-lg font-bold text-on-surface">
                       {parsedBook.totalWords.toLocaleString()}
                     </div>
                   </div>
@@ -368,11 +414,11 @@ export default function ImportPage() {
 
         {/* ERROR STATE */}
         {state === "ERROR" && (
-          <div className="backdrop-blur-md bg-zinc-900/60 border border-zinc-800 rounded-2xl p-8 shadow-2xl">
-            <div className="flex items-center gap-3 text-red-500 mb-6 pb-4 border-b border-zinc-800">
+          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-500 mb-6 pb-4 border-b border-border-subtle">
               <ShieldAlert className="h-8 w-8 text-red-500" />
               <div>
-                <h3 className="text-xl font-semibold text-zinc-100">
+                <h3 className="text-xl font-semibold text-on-surface">
                   Parser Exception
                 </h3>
                 <span className="text-xs text-red-400 uppercase tracking-wider font-semibold font-mono">
@@ -381,7 +427,7 @@ export default function ImportPage() {
               </div>
             </div>
 
-            <div className="bg-zinc-950/60 border border-red-950/40 rounded-xl p-6 text-zinc-300 text-sm mb-8 leading-relaxed">
+            <div className="bg-surface-container-lowest/60 border border-red-950/40 rounded-xl p-6 text-on-surface-variant text-sm mb-8 leading-relaxed">
               {errorMessage}
             </div>
 

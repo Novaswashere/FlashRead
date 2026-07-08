@@ -16,8 +16,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [theme, setThemeState] = useState<Theme>("light");
 
+  useEffect(() => {
+    const saved = localStorage.getItem("flashread_theme") as Theme;
+    if (saved === "light" || saved === "dark" || saved === "sepia" || saved === "system") {
+      setThemeState(saved);
+    }
+  }, []);
+
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
+    localStorage.setItem("flashread_theme", newTheme);
   };
 
   useEffect(() => {

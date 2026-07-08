@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import { SettingsProvider } from "@/providers/SettingsProvider";
 import { LibraryProvider } from "@/providers/LibraryProvider";
 import { ReaderProvider } from "@/providers/ReaderProvider";
+import { LayoutProvider } from "@/providers/LayoutProvider";
 import { TopAppBar } from "@/components/layout/TopAppBar";
 import { NavigationDrawer } from "@/components/layout/NavigationDrawer";
 import { BottomNavBar } from "@/components/layout/BottomNavBar";
@@ -25,14 +26,16 @@ export default function RootLayout({
           <SettingsProvider>
             <LibraryProvider>
               <ReaderProvider>
-                <div className="flex flex-col min-h-screen">
-                  <TopAppBar />
-                  <div className="flex flex-1">
-                    <NavigationDrawer />
-                    <div className="flex-1">{children}</div>
+                <LayoutProvider>
+                  <div className="flex flex-col min-h-screen">
+                    <TopAppBar />
+                    <div className="flex flex-1">
+                      <NavigationDrawer />
+                      <div className="flex-1">{children}</div>
+                    </div>
+                    <BottomNavBar />
                   </div>
-                  <BottomNavBar />
-                </div>
+                </LayoutProvider>
               </ReaderProvider>
             </LibraryProvider>
           </SettingsProvider>

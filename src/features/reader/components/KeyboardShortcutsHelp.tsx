@@ -46,7 +46,10 @@ export const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
         </div>
 
         <div>
-          <h4 className="font-label-mono text-label-mono text-on-surface-variant uppercase tracking-wider mb-space-sm">
+          <h4
+            className="font-label-mono text-label-mono uppercase tracking-wider mb-space-sm"
+            style={{ color: "var(--on-surface-variant)" }}
+          >
             Keyboard Shortcuts
           </h4>
           <div className="flex flex-col gap-3">
@@ -55,7 +58,10 @@ export const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
                 key={idx}
                 className="flex items-center justify-between py-1 border-b border-border-subtle last:border-b-0"
               >
-                <span className="text-sm text-on-surface-variant">
+                <span
+                  className="text-sm"
+                  style={{ color: "var(--on-surface-variant)" }}
+                >
                   {sh.description}
                 </span>
                 <div className="flex gap-1">

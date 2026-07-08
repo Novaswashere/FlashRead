@@ -2,14 +2,16 @@ import React from "react";
 import { Slider } from "@/components/ui/Slider";
 
 export interface ReaderProgressProps {
-  progressPercent: number;
+  currentIndex: number;
+  totalWords: number;
   elapsedTimeLabel: string;
   remainingTimeLabel: string;
-  onProgressScrub: (percent: number) => void;
+  onProgressScrub: (index: number) => void;
 }
 
 export const ReaderProgress: React.FC<ReaderProgressProps> = ({
-  progressPercent,
+  currentIndex,
+  totalWords,
   elapsedTimeLabel,
   remainingTimeLabel,
   onProgressScrub,
@@ -21,9 +23,9 @@ export const ReaderProgress: React.FC<ReaderProgressProps> = ({
         <span>{remainingTimeLabel}</span>
       </div>
       <Slider
-        max="100"
-        min="0"
-        value={progressPercent}
+        max={totalWords}
+        min={0}
+        value={currentIndex}
         onChange={(e) => onProgressScrub(parseInt(e.target.value) || 0)}
       />
     </div>

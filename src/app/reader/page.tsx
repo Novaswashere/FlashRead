@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ReaderProvider, useReaderContext } from "@/providers/ReaderProvider";
+import { useSettingsContext } from "@/providers/SettingsProvider";
+import { useTheme } from "@/hooks/useTheme";
 import { useKeyboardShortcuts } from "@/features/reader/hooks/useKeyboardShortcuts";
 import { ReaderCanvas } from "@/features/reader/components/ReaderCanvas";
 import { ReaderWordDisplay } from "@/features/reader/components/ReaderWordDisplay";
@@ -11,7 +13,8 @@ import { ReaderControls } from "@/features/reader/components/ReaderControls";
 import { ReaderProgress } from "@/features/reader/components/ReaderProgress";
 import { ReaderStats } from "@/features/reader/components/ReaderStats";
 import { SpeedControl } from "@/features/reader/components/SpeedControl";
-import { KeyboardShortcutsHelp } from "@/features/reader/components/KeyboardShortcutsHelp";
+import { AppearanceSettingsModal } from "@/features/reader/components/AppearanceSettingsModal";
+import { PlaybackSettingsModal } from "@/features/reader/components/PlaybackSettingsModal";
 import { storageService } from "@/services/storage";
 import { Book, ParsedBook, ReadingProgress as ProgressType } from "@/types";
 import {
@@ -68,11 +71,23 @@ function ReaderInner({
 }: ReaderInnerProps) {
   const router = useRouter();
   const { snapshot, actions } = useReaderContext();
+  const { settings, updateSettings } = useSettingsContext();
+  const { theme, setTheme } = useTheme();
 
   // Local presentation controls
-  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showAppearanceModal, setShowAppearanceModal] = useState(false);
+  const [showPlaybackModal, setShowPlaybackModal] = useState(false);
   const [showSpeedPicker, setShowSpeedPicker] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+
+  const activeTheme =
+    theme === "system"
+      ? typeof window !== "undefined" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : theme === "sepia"
+        ? "light"
+        : theme;
 
   // Autoplay countdown state
   const [autoplaySeconds, setAutoplaySeconds] = useState(5);
@@ -114,11 +129,9 @@ function ReaderInner({
     onWpmChange(snapshot.wpm);
   }, [snapshot.wpm]);
 
-  const handleThemeChange = (theme: "light" | "dark") => {
-    setCurrentTheme(theme);
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark", "sepia");
-    root.classList.add(theme);
+  const handleThemeChange = (newTheme: "light" | "dark") => {
+    setTheme(newTheme);
+    updateSettings({ theme: newTheme });
   };
 
   const handleBack = () => {
@@ -137,9 +150,8 @@ function ReaderInner({
     }
   };
 
-  const handleProgressScrub = (percent: number) => {
-    const targetIndex = Math.round((percent / 100) * snapshot.totalWords);
-    actions.seek(targetIndex);
+  const handleProgressScrub = (index: number) => {
+    actions.seek(index);
   };
 
   return (
@@ -151,7 +163,8 @@ function ReaderInner({
         title={book.title}
         chapterLabel={`Chapter ${currentChapterIndex + 1} of ${chaptersCount} • ${Math.round(snapshot.progressPercent)}%`}
         onBackClick={handleBack}
-        onTextSettingsClick={() => setShowShortcuts(true)}
+        onTextSettingsClick={() => setShowAppearanceModal(true)}
+        onMoreActionsClick={() => setShowPlaybackModal(true)}
       />
 
       {/* Chapter navigation hotkeys in header */}
@@ -159,7 +172,7 @@ function ReaderInner({
         <button
           onClick={handlePrevChapter}
           disabled={currentChapterIndex === 0}
-          className="p-1.5 rounded bg-zinc-900 border border-zinc-800 hover:border-zinc-700 disabled:opacity-30 disabled:hover:border-zinc-800 transition text-zinc-400"
+          className="p-1.5 rounded bg-surface-container dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 hover:border-border-subtle/80 dark:hover:border-zinc-700 disabled:opacity-30 transition text-on-surface-variant dark:text-zinc-400 active:scale-95 cursor-pointer"
           title="Previous Chapter"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -167,7 +180,7 @@ function ReaderInner({
         <button
           onClick={handleNextChapter}
           disabled={!hasNextChapter}
-          className="p-1.5 rounded bg-zinc-900 border border-zinc-800 hover:border-zinc-700 disabled:opacity-30 disabled:hover:border-zinc-800 transition text-zinc-400"
+          className="p-1.5 rounded bg-surface-container dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 hover:border-border-subtle/80 dark:hover:border-zinc-700 disabled:opacity-30 transition text-on-surface-variant dark:text-zinc-400 active:scale-95 cursor-pointer"
           title="Next Chapter"
         >
           <ArrowRight className="h-4 w-4" />
@@ -179,10 +192,14 @@ function ReaderInner({
           onCanvasClick={() =>
             snapshot.state === "playing" ? actions.pause() : actions.play()
           }
+          orpEnabled={settings.orpEnabled}
         >
           <ReaderWordDisplay
             word={snapshot.currentWord}
             orpIndex={snapshot.orpIndex}
+            font={settings.font}
+            fontSize={settings.fontSize}
+            orpEnabled={settings.orpEnabled}
           />
           {snapshot.state === "playing" && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-32 h-1 bg-primary/20 blur-xl"></div>
@@ -191,42 +208,42 @@ function ReaderInner({
 
         {/* OVERLAY: Chapter / Book Completion */}
         {isChapterFinished && (
-          <div className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md flex items-center justify-center z-50 p-6">
-            <div className="max-w-[450px] w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center shadow-2xl animate-in fade-in zoom-in duration-300">
+          <div className="absolute inset-0 bg-white/95 dark:bg-zinc-950/90 backdrop-blur-md flex items-center justify-center z-50 p-6">
+            <div className="max-w-[450px] w-full bg-surface-container-lowest dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 rounded-2xl p-8 text-center shadow-2xl animate-in fade-in zoom-in duration-300">
               {hasNextChapter ? (
                 <>
-                  <div className="h-14 w-14 bg-cyan-950 border border-cyan-800 rounded-full flex items-center justify-center mx-auto mb-6 text-cyan-400 animate-bounce">
+                  <div className="h-14 w-14 bg-primary/10 dark:bg-cyan-950 border border-primary/20 dark:border-cyan-800 rounded-full flex items-center justify-center mx-auto mb-6 text-primary dark:text-cyan-400 animate-bounce">
                     <Trophy className="h-6 w-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-zinc-100 mb-2">
+                  <h3 className="text-xl font-bold text-on-surface mb-2">
                     Chapter Completed!
                   </h3>
-                  <p className="text-zinc-400 text-sm mb-6">
+                  <p className="text-on-surface-variant text-sm mb-6">
                     You read {snapshot.totalWords} words at {snapshot.wpm} WPM.
                     Excellent speed reading.
                   </p>
 
-                  <div className="bg-zinc-950 border border-zinc-850 rounded-xl p-5 mb-6 text-left">
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-cyan-500 block mb-1">
+                  <div className="bg-surface-container dark:bg-zinc-950 border border-border-subtle dark:border-zinc-850 rounded-xl p-5 mb-6 text-left">
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-primary dark:text-cyan-500 block mb-1">
                       Up Next
                     </span>
-                    <div className="font-medium text-zinc-200 line-clamp-1">
+                    <div className="font-medium text-on-surface line-clamp-1">
                       {parsedBook.chapters[currentChapterIndex + 1]?.title ||
                         `Chapter ${currentChapterIndex + 2}`}
                     </div>
                   </div>
 
                   {!isAutoplayPaused ? (
-                    <div className="text-xs text-zinc-500 mb-6 flex items-center justify-center gap-1.5">
-                      <span className="inline-block h-2 w-2 rounded-full bg-cyan-500 animate-ping" />
+                    <div className="text-xs text-on-surface-variant mb-6 flex items-center justify-center gap-1.5">
+                      <span className="inline-block h-2 w-2 rounded-full bg-primary dark:bg-cyan-500 animate-ping" />
                       Auto-advancing in{" "}
-                      <span className="font-bold text-zinc-300">
+                      <span className="font-bold text-on-surface">
                         {autoplaySeconds}s
                       </span>
                       ...
                     </div>
                   ) : (
-                    <div className="text-xs text-zinc-500 mb-6">
+                    <div className="text-xs text-on-surface-variant mb-6">
                       Autoplay paused
                     </div>
                   )}
@@ -234,13 +251,13 @@ function ReaderInner({
                   <div className="flex gap-4">
                     <button
                       onClick={() => setIsAutoplayPaused((p) => !p)}
-                      className="flex-1 px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium border border-zinc-700 transition"
+                      className="flex-1 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high dark:bg-zinc-800 dark:hover:bg-zinc-700 text-on-surface dark:text-zinc-300 text-sm font-medium border border-border-subtle dark:border-zinc-700 transition"
                     >
                       {isAutoplayPaused ? "Resume Autoplay" : "Pause"}
                     </button>
                     <button
                       onClick={handleNextChapter}
-                      className="flex-1 px-4 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-cyan-950/20"
+                      className="flex-1 px-4 py-2.5 rounded-lg bg-primary hover:brightness-110 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-on-primary dark:text-zinc-950 font-bold text-sm transition shadow-lg shadow-primary-container/20 dark:shadow-cyan-950/20"
                     >
                       Read Next Chapter
                     </button>
@@ -248,15 +265,15 @@ function ReaderInner({
                 </>
               ) : (
                 <>
-                  <div className="h-16 w-16 bg-gradient-to-tr from-yellow-500 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-950 animate-pulse shadow-lg shadow-yellow-950/20">
+                  <div className="h-16 w-16 bg-gradient-to-tr from-yellow-500 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-950 animate-pulse shadow-lg shadow-yellow-500/20 dark:shadow-yellow-950/20">
                     <Trophy className="h-8 w-8" />
                   </div>
-                  <h3 className="text-2xl font-bold text-zinc-100 mb-2">
+                  <h3 className="text-2xl font-bold text-on-surface mb-2">
                     Book Finished!
                   </h3>
-                  <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
+                  <p className="text-on-surface-variant text-sm mb-8 leading-relaxed">
                     Congratulations! You have successfully completed reading{" "}
-                    <span className="text-zinc-200 font-semibold">
+                    <span className="text-on-surface font-semibold">
                       &ldquo;{book.title}&rdquo;
                     </span>
                     .
@@ -264,14 +281,19 @@ function ReaderInner({
 
                   <div className="flex flex-col gap-3">
                     <button
-                      onClick={() => onChapterChange(0)}
-                      className="w-full px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium border border-zinc-700 transition flex items-center justify-center gap-2"
+                      onClick={() => {
+                        actions.seek(0);
+                        if (currentChapterIndex > 0) {
+                          onChapterChange(0);
+                        }
+                      }}
+                      className="w-full px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high dark:bg-zinc-800 dark:hover:bg-zinc-700 text-on-surface dark:text-zinc-200 text-sm font-medium border border-border-subtle dark:border-zinc-700 transition flex items-center justify-center gap-2"
                     >
                       <RefreshCw className="h-4 w-4" /> Restart Book
                     </button>
                     <button
                       onClick={handleBack}
-                      className="w-full px-4 py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-zinc-950 font-bold text-sm transition flex items-center justify-center gap-2"
+                      className="w-full px-4 py-2.5 rounded-lg bg-primary hover:brightness-110 dark:bg-gradient-to-r dark:from-cyan-500 dark:to-emerald-500 dark:hover:from-cyan-400 dark:hover:to-emerald-400 text-on-primary dark:text-zinc-950 font-bold text-sm transition flex items-center justify-center gap-2"
                     >
                       <Library className="h-4 w-4" /> Back to Library
                     </button>
@@ -285,9 +307,10 @@ function ReaderInner({
 
       {/* Floating control dock */}
       <footer className="relative w-full max-w-[600px] px-space-md z-45 mb-space-xl">
-        <div className="glass-dock rounded-xl p-space-md shadow-sm flex flex-col gap-space-md">
+        <div className="bg-white/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800/80 backdrop-blur-md rounded-xl p-space-md shadow-sm flex flex-col gap-space-md">
           <ReaderProgress
-            progressPercent={snapshot.progressPercent}
+            currentIndex={snapshot.currentIndex}
+            totalWords={snapshot.totalWords}
             elapsedTimeLabel={snapshot.elapsedTimeLabel}
             remainingTimeLabel={`${snapshot.remainingTimeLabel} remaining`}
             onProgressScrub={handleProgressScrub}
@@ -355,11 +378,17 @@ function ReaderInner({
         )}
       </footer>
 
-      {showShortcuts && (
-        <KeyboardShortcutsHelp
-          onClose={() => setShowShortcuts(false)}
-          currentTheme={currentTheme}
+      {showAppearanceModal && (
+        <AppearanceSettingsModal
+          onClose={() => setShowAppearanceModal(false)}
+          currentTheme={activeTheme}
           onThemeSelect={handleThemeChange}
+        />
+      )}
+
+      {showPlaybackModal && (
+        <PlaybackSettingsModal
+          onClose={() => setShowPlaybackModal(false)}
         />
       )}
     </div>
@@ -368,14 +397,16 @@ function ReaderInner({
 
 function ReaderLoader() {
   const searchParams = useSearchParams();
-  const bookId = searchParams.get("id") || "";
+  const bookIdParam = searchParams.get("id") || "";
   const router = useRouter();
+  const { settings } = useSettingsContext();
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [book, setBook] = useState<Book | null>(null);
   const [parsedBook, setParsedBook] = useState<ParsedBook | null>(null);
   const [progress, setProgress] = useState<ProgressType | null>(null);
+  const [activeBookId, setActiveBookId] = useState("");
 
   // Active playing settings
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
@@ -383,20 +414,40 @@ function ReaderLoader() {
   const [currentWpm, setCurrentWpm] = useState(350);
 
   useEffect(() => {
-    if (!bookId) {
-      setError("No book ID specified in reader URL.");
-      setIsLoading(false);
-      return;
-    }
-
     async function loadBookData() {
       try {
-        const fetchedBook = await storageService.books.getById(bookId);
-        const fetchedParsed = await storageService.parsedBooks.getById(bookId);
-        const fetchedProgress = await storageService.progress.getById(bookId);
+        let idToLoad = bookIdParam;
+        if (!idToLoad) {
+          const allBooks = await storageService.books.getAll();
+          if (allBooks.length > 0) {
+            // Find most recently opened from progress
+            const progresses: ProgressType[] = [];
+            for (const b of allBooks) {
+              const p = await storageService.progress.getById(b.id);
+              if (p) progresses.push(p);
+            }
+            progresses.sort((a, b) => b.lastOpened.localeCompare(a.lastOpened));
+            if (progresses.length > 0) {
+              idToLoad = progresses[0].bookId;
+            } else {
+              idToLoad = allBooks[0].id;
+            }
+          } else {
+            setError("Select a Book from the Library");
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        setActiveBookId(idToLoad);
+
+        const fetchedBook = await storageService.books.getById(idToLoad);
+        const fetchedParsed =
+          await storageService.parsedBooks.getById(idToLoad);
+        const fetchedProgress = await storageService.progress.getById(idToLoad);
 
         if (!fetchedBook || !fetchedParsed) {
-          setError("Book not found in IndexedDB library.");
+          setError("Select a Book from the Library");
           setIsLoading(false);
           return;
         }
@@ -413,17 +464,17 @@ function ReaderLoader() {
 
         setIsLoading(false);
       } catch (err: any) {
-        setError(`Failed to read from IndexedDB: ${err?.message || err}`);
+        setError("Select a Book from the Library");
         setIsLoading(false);
       }
     }
 
     loadBookData();
-  }, [bookId]);
+  }, [bookIdParam]);
 
   // Debounced progress saving effect
   useEffect(() => {
-    if (!bookId || isLoading || error || !parsedBook) return;
+    if (!activeBookId || isLoading || error || !parsedBook) return;
 
     const saveProgress = async () => {
       const totalChapters = parsedBook.chapters.length;
@@ -440,7 +491,7 @@ function ReaderLoader() {
       );
 
       const progressUpdate: ProgressType = {
-        bookId,
+        bookId: activeBookId,
         currentChapterIndex,
         currentWordIndex,
         wpm: currentWpm,
@@ -461,14 +512,14 @@ function ReaderLoader() {
     currentWordIndex,
     currentWpm,
     currentChapterIndex,
-    bookId,
+    activeBookId,
     parsedBook,
     isLoading,
   ]);
 
   if (isLoading) {
     return (
-      <div className="bg-zinc-950 min-h-screen text-zinc-100 flex flex-col items-center justify-center">
+      <div className="bg-background min-h-screen text-on-background flex flex-col items-center justify-center">
         <Loader2 className="h-10 w-10 text-cyan-500 animate-spin mb-4" />
         <span className="text-zinc-400 text-sm">Opening reader canvas...</span>
       </div>
@@ -477,19 +528,25 @@ function ReaderLoader() {
 
   if (error || !book || !parsedBook || !progress) {
     return (
-      <div className="bg-zinc-950 min-h-screen text-zinc-100 flex flex-col items-center justify-center p-6 text-center">
-        <div className="max-w-[400px] bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-xl">
-          <h3 className="text-lg font-bold text-red-500 mb-2">
-            Error Loading Book
+      <div className="bg-background min-h-screen text-on-background flex flex-col items-center justify-center p-6 text-center">
+        <div className="max-w-[400px] bg-surface-container border border-border-subtle rounded-xl p-6 shadow-xl text-center">
+          <span
+            className="material-symbols-outlined text-5xl text-primary mb-4"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            auto_stories
+          </span>
+          <h3 className="text-lg font-bold text-on-surface mb-2">
+            No Book Selected
           </h3>
-          <p className="text-zinc-400 text-sm mb-6">
-            {error || "Could not initialize document state."}
+          <p className="text-on-surface-variant text-sm mb-6">
+            Select a Book from the Library to start reading.
           </p>
           <button
             onClick={() => router.push("/")}
-            className="w-full px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-semibold rounded-lg border border-zinc-750 transition"
+            className="w-full px-4 py-2.5 bg-primary text-on-primary hover:brightness-110 text-sm font-semibold rounded-lg transition-all"
           >
-            Return to Library
+            Go to Library
           </button>
         </div>
       </div>
@@ -502,10 +559,11 @@ function ReaderLoader() {
   return (
     /* We change the key whenever the chapter changes so that the RSVP engine unmounts and remounts cleanly */
     <ReaderProvider
-      key={`${bookId}-${currentChapterIndex}`}
+      key={`${activeBookId}-${currentChapterIndex}`}
       text={currentChapter.content}
       initialWpm={currentWpm}
       initialWordIndex={currentWordIndex}
+      smartPauseEnabled={settings.smartPauseEnabled}
       onWordIndexChange={setCurrentWordIndex}
       onWpmChange={setCurrentWpm}
     >
@@ -529,7 +587,7 @@ export default function ReaderPage() {
   return (
     <Suspense
       fallback={
-        <div className="bg-zinc-950 min-h-screen text-zinc-100 flex flex-col items-center justify-center">
+        <div className="bg-background min-h-screen text-on-background flex flex-col items-center justify-center">
           <Loader2 className="h-10 w-10 text-cyan-500 animate-spin mb-4" />
           <span className="text-zinc-400 text-sm font-medium">
             Booting engine...

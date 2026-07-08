@@ -16,7 +16,7 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
   onMoreActionsClick,
 }) => {
   return (
-    <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-border-subtle md:pr-64">
+    <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md md:pl-64">
       <div className="flex items-center justify-between px-space-lg h-16 max-w-container-max mx-auto">
         <div className="flex items-center gap-space-md">
           <button

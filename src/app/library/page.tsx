@@ -64,7 +64,7 @@ export default function LibraryPage() {
   });
 
   return (
-    <main className="pt-24 pb-20 px-space-md md:px-space-xl max-w-[900px] mx-auto min-h-screen md:pl-72 text-left bg-zinc-950 text-zinc-100">
+    <main className="pt-24 pb-20 px-space-md md:px-space-xl max-w-[900px] mx-auto min-h-screen md:pl-72 text-left bg-background text-on-background">
       <LibrarySearch value={search} onChange={setSearch} />
       <LibraryFilters
         activeFilter={activeFilter}

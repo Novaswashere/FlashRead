@@ -2,9 +2,11 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
+import { useLayoutContext } from "@/providers/LayoutProvider";
 
 export const TopAppBar: React.FC = () => {
   const pathname = usePathname();
+  const { toggleMobileMenu } = useLayoutContext();
 
   // Hide the global app bar on the reader page, as it has its own toolbar
   if (pathname === "/reader") return null;
@@ -15,7 +17,10 @@ export const TopAppBar: React.FC = () => {
     <header className="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-border-subtle dark:border-outline-variant">
       <div className="relative flex items-center justify-between px-space-lg h-16 max-w-container-max mx-auto">
         <div className="flex items-center gap-space-md">
-          <button className="p-2 hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform">
+          <button
+            onClick={toggleMobileMenu}
+            className="p-2 hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform"
+          >
             <span className="material-symbols-outlined text-on-surface-variant dark:text-outline">
               menu
             </span>

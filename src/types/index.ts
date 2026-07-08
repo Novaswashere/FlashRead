@@ -25,4 +25,6 @@ export interface Settings {
   orpEnabled: boolean;
   smartPauseEnabled: boolean;
   readingMode: "rsvp" | "traditional";
+  reducedMotion: boolean;
+  screenReaderOptimized: boolean;
 }

@@ -9,12 +9,13 @@ import { RecentBooksCarousel } from "@/features/home/components/RecentBooksCarou
 import { LibraryGrid } from "@/features/home/components/LibraryGrid";
 import { QuickImportCard } from "@/features/home/components/QuickImportCard";
 import { Book, ReadingProgress as ProgressType } from "@/types";
-import { MOCK_SETTINGS } from "@/mocks/settings";
+import { useSettingsContext } from "@/providers/SettingsProvider";
 import { Loader2 } from "lucide-react";
 
 export default function HomePage() {
   const router = useRouter();
   const { books, isLoading } = useLibraryContext();
+  const { settings } = useSettingsContext();
 
   const [activeBook, setActiveBook] = useState<Book | null>(null);
   const [activeProgress, setActiveProgress] = useState<ProgressType | null>(
@@ -80,7 +81,7 @@ export default function HomePage() {
 
   if (isLoading || books.length === 0 || !activeBook || !activeProgress) {
     return (
-      <div className="bg-zinc-950 min-h-screen text-zinc-100 flex flex-col items-center justify-center">
+      <div className="bg-background min-h-screen text-on-background flex flex-col items-center justify-center">
         <Loader2 className="h-10 w-10 text-cyan-500 animate-spin mb-4" />
         <span className="text-zinc-400 text-sm">Loading Library...</span>
       </div>
@@ -91,13 +92,13 @@ export default function HomePage() {
   const mobileBooks = books.slice(0, 5);
 
   return (
-    <main className="pt-24 pb-32 max-w-container-max mx-auto px-space-md md:px-space-xl md:pl-72 text-left bg-zinc-950 text-zinc-100 min-h-screen">
+    <main className="pt-24 pb-32 max-w-container-max mx-auto px-space-md md:px-space-xl md:pl-72 text-left bg-background text-on-background min-h-screen">
       {/* Mobile-only Home Layout */}
       <div className="block md:hidden">
         <ContinueReadingHero
           book={activeBook}
           progress={activeProgress}
-          defaultWpm={MOCK_SETTINGS.defaultWPM}
+          defaultWpm={settings.defaultWPM}
           onResume={() => handleSelectBook(activeBook)}
         />
         <RecentBooksCarousel
@@ -113,7 +114,7 @@ export default function HomePage() {
         <ContinueReadingHero
           book={activeBook}
           progress={activeProgress}
-          defaultWpm={MOCK_SETTINGS.defaultWPM}
+          defaultWpm={settings.defaultWPM}
           onResume={() => handleSelectBook(activeBook)}
         />
         <RecentBooksCarousel

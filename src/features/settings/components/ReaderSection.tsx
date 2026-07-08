@@ -52,7 +52,7 @@ export const ReaderSection: React.FC<ReaderSectionProps> = ({
       <Switch
         icon="format_paint"
         label="ORP Highlight"
-        description="Highlight the Optimal Recognition Point in red"
+        description="Highlight the Optimal Recognition Point in blue"
         checked={orpEnabled}
         onChange={(e) => onOrpChange(e.target.checked)}
       />

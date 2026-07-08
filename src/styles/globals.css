@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 
 @tailwind base;
@@ -52,7 +52,7 @@
 
 @layer base {
   body {
-    min-height: max(884px, 100dvh);
+    min-height: 100dvh;
     @apply bg-background text-on-background font-sans transition-colors duration-200;
   }
 }
@@ -77,8 +77,8 @@
   transform: translateX(-50%);
   width: 2px;
   height: 12px;
-  background-color: #ef4444;
-  opacity: 0.4;
+  background-color: var(--primary);
+  opacity: 0.5;
 }
 .orp-marker::before {
   top: -20px;
@@ -90,20 +90,19 @@
 /* Custom range slider styling */
 input[type="range"] {
   -webkit-appearance: none;
-  background: transparent;
 }
 input[type="range"]::-webkit-slider-runnable-track {
   width: 100%;
   height: 4px;
   cursor: pointer;
-  background: #e2e8f0;
+  background: transparent;
   border-radius: 2px;
 }
 input[type="range"]::-webkit-slider-thumb {
   height: 16px;
   width: 16px;
   border-radius: 50%;
-  background: #004ac6;
+  background: var(--primary);
   cursor: pointer;
   -webkit-appearance: none;
   margin-top: -6px;

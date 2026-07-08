@@ -18,4 +18,5 @@ export interface PlaybackActions {
   pause: () => void;
   seek: (index: number) => void;
   setWpm: (wpm: number) => void;
+  setSmartPause: (enabled: boolean) => void;
 }

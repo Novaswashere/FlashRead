@@ -1,37 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { MOCK_USER } from "@/mocks/user";
-import { MOCK_SETTINGS } from "@/mocks/settings";
 import { ThemeSection } from "@/features/settings/components/ThemeSection";
 import { FontSection } from "@/features/settings/components/FontSection";
 import { ReaderSection } from "@/features/settings/components/ReaderSection";
 import { AccessibilitySection } from "@/features/settings/components/AccessibilitySection";
 import { ProfileSection } from "@/features/settings/components/ProfileSection";
+import { PreviewSection } from "@/features/settings/components/PreviewSection";
 import { useTheme } from "@/hooks/useTheme";
+import { useSettingsContext } from "@/providers/SettingsProvider";
 
 export default function SettingsPage() {
   const { setTheme } = useTheme();
-
-  // Local settings states populated from mocks
-  const [wpm, setWpm] = useState(MOCK_SETTINGS.defaultWPM);
-  const [orpEnabled, setOrpEnabled] = useState(MOCK_SETTINGS.orpEnabled);
-  const [smartPauseEnabled, setSmartPauseEnabled] = useState(
-    MOCK_SETTINGS.smartPauseEnabled
-  );
-  const [themeValue, setThemeValue] = useState<"light" | "dark" | "system">(
-    "light"
-  );
-  const [fontFamily, setFontFamily] = useState<
-    "Inter" | "Open Sans" | "Merriweather" | "JetBrains Mono"
-  >("Inter");
-  const [fontSize, setFontSize] = useState(MOCK_SETTINGS.fontSize);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [screenReaderOptimized, setScreenReaderOptimized] = useState(false);
+  const { settings, updateSettings } = useSettingsContext();
 
   const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
-    setThemeValue(newTheme);
     setTheme(newTheme);
+    updateSettings({ theme: newTheme });
   };
 
   const handleSignOut = () => {
@@ -57,14 +43,26 @@ export default function SettingsPage() {
           </h3>
           <div className="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden divide-y divide-border-subtle">
             <ReaderSection
-              defaultWpm={wpm}
-              orpEnabled={orpEnabled}
-              smartPauseEnabled={smartPauseEnabled}
-              onWpmChange={setWpm}
-              onOrpChange={setOrpEnabled}
-              onSmartPauseChange={setSmartPauseEnabled}
+              defaultWpm={settings.defaultWPM}
+              orpEnabled={settings.orpEnabled}
+              smartPauseEnabled={settings.smartPauseEnabled}
+              onWpmChange={(wpm) => updateSettings({ defaultWPM: wpm })}
+              onOrpChange={(orp) => updateSettings({ orpEnabled: orp })}
+              onSmartPauseChange={(smartPause) => updateSettings({ smartPauseEnabled: smartPause })}
             />
           </div>
+        </section>
+
+        {/* Preview */}
+        <section>
+          <h3 className="font-label-mono text-label-mono text-primary uppercase tracking-wider mb-space-sm">
+            Preview
+          </h3>
+          <PreviewSection
+            font={settings.font}
+            fontSize={settings.fontSize}
+            orpEnabled={settings.orpEnabled}
+          />
         </section>
 
         {/* Appearance */}
@@ -74,14 +72,14 @@ export default function SettingsPage() {
           </h3>
           <div className="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden divide-y divide-border-subtle">
             <ThemeSection
-              currentTheme={themeValue}
+              currentTheme={settings.theme}
               onThemeChange={handleThemeChange}
             />
             <FontSection
-              currentFont={fontFamily}
-              currentFontSize={fontSize}
-              onFontChange={setFontFamily}
-              onFontSizeChange={setFontSize}
+              currentFont={settings.font}
+              currentFontSize={settings.fontSize}
+              onFontChange={(font) => updateSettings({ font })}
+              onFontSizeChange={(size) => updateSettings({ fontSize: size })}
             />
           </div>
         </section>
@@ -93,10 +91,10 @@ export default function SettingsPage() {
           </h3>
           <div className="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden divide-y divide-border-subtle">
             <AccessibilitySection
-              reducedMotion={reducedMotion}
-              screenReaderOptimized={screenReaderOptimized}
-              onReducedMotionChange={setReducedMotion}
-              onScreenReaderChange={setScreenReaderOptimized}
+              reducedMotion={settings.reducedMotion}
+              screenReaderOptimized={settings.screenReaderOptimized}
+              onReducedMotionChange={(reduced) => updateSettings({ reducedMotion: reduced })}
+              onScreenReaderChange={(sr) => updateSettings({ screenReaderOptimized: sr })}
             />
           </div>
         </section>

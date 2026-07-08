@@ -21,6 +21,7 @@ export class PlaybackController {
   private queue: WordQueue;
   private _state: PlaybackState = "paused";
   private _wpm: number;
+  private _smartPause: boolean = true;
 
   // Timing internals
   private rafId: number | null = null;
@@ -36,9 +37,10 @@ export class PlaybackController {
   private snapshotVersion: number = 0;
   private lastEmittedVersion: number = -1;
 
-  constructor(text: string, options?: { wpm?: number }) {
+  constructor(text: string, options?: { wpm?: number; smartPause?: boolean }) {
     this.queue = new WordQueue(text);
     this._wpm = options?.wpm ?? 350;
+    this._smartPause = options?.smartPause ?? true;
     this.cachedSnapshot = this.buildSnapshot();
   }
 
@@ -109,6 +111,11 @@ export class PlaybackController {
     this.invalidateAndNotify();
   }
 
+  setSmartPause(enabled: boolean): void {
+    this._smartPause = enabled;
+    this.invalidateAndNotify();
+  }
+
   destroy(): void {
     this.stopLoop();
     this.listeners.clear();
@@ -142,7 +149,7 @@ export class PlaybackController {
 
     const currentWord = this.queue.getCurrentWord();
     const duration = currentWord
-      ? getWordDurationMs(this._wpm, currentWord)
+      ? getWordDurationMs(this._wpm, currentWord, this._smartPause)
       : 0;
 
     if (duration > 0 && this.accumulated >= duration) {

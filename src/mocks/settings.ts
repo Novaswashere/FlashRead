@@ -8,4 +8,6 @@ export const MOCK_SETTINGS: Settings = {
   orpEnabled: true,
   smartPauseEnabled: true,
   readingMode: "rsvp",
+  reducedMotion: false,
+  screenReaderOptimized: false,
 };

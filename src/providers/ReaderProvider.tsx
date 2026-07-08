@@ -18,6 +18,7 @@ export const ReaderProvider: React.FC<{
   text?: string;
   initialWpm?: number;
   initialWordIndex?: number;
+  smartPauseEnabled?: boolean;
   onWordIndexChange?: (index: number) => void;
   onWpmChange?: (wpm: number) => void;
   children: React.ReactNode;
@@ -25,11 +26,12 @@ export const ReaderProvider: React.FC<{
   text = "",
   initialWpm = 350,
   initialWordIndex = 0,
+  smartPauseEnabled = true,
   onWordIndexChange,
   onWpmChange,
   children,
 }) => {
-  const { snapshot, actions } = useRsvpEngine(text, initialWpm);
+  const { snapshot, actions } = useRsvpEngine(text, initialWpm, smartPauseEnabled);
 
   // Handle initial seek on mount
   const initialSeekDone = useRef(false);

@@ -35,11 +35,23 @@ export const FontSection: React.FC<FontSectionProps> = ({
             <button
               key={f}
               onClick={() => onFontChange(f)}
-              className={`px-4 py-2 rounded-lg border-2 ${
+              className={`px-4 py-2 rounded-lg border-2 transition-all duration-150 active:scale-95 text-on-surface ${
                 currentFont === f
-                  ? "border-primary font-bold"
-                  : "border-border-subtle hover:bg-surface-container-low"
+                  ? "border-primary bg-primary/5 font-bold text-primary dark:text-primary-fixed"
+                  : "border-border-subtle dark:border-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest"
               }`}
+              style={{
+                fontFamily:
+                  f === "JetBrains Mono"
+                    ? "JetBrains Mono, monospace"
+                    : f === "Merriweather"
+                      ? "Merriweather, serif"
+                      : f === "Open Sans"
+                        ? "'Open Sans', sans-serif"
+                        : f === "Inter"
+                          ? "'Inter', sans-serif"
+                          : f,
+              }}
             >
               {f}
             </button>

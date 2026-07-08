@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { Settings } from "../types";
 
 interface SettingsContextProps {
@@ -16,6 +16,8 @@ const defaultSettings: Settings = {
   orpEnabled: true,
   smartPauseEnabled: true,
   readingMode: "rsvp",
+  reducedMotion: false,
+  screenReaderOptimized: false,
 };
 
 const SettingsContext = createContext<SettingsContextProps | undefined>(
@@ -27,8 +29,24 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("flashread_settings");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setSettings((prev) => ({ ...prev, ...parsed }));
+      } catch (e) {
+        console.error("Failed to parse settings", e);
+      }
+    }
+  }, []);
+
   const updateSettings = (newSettings: Partial<Settings>) => {
-    setSettings((prev) => ({ ...prev, ...newSettings }));
+    setSettings((prev) => {
+      const updated = { ...prev, ...newSettings };
+      localStorage.setItem("flashread_settings", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   return (

@@ -24,12 +24,12 @@ export const ContinueReadingHero: React.FC<ContinueReadingHeroProps> = ({
         Continue Reading
       </h2>
       <div className="group relative overflow-hidden bg-surface-container-lowest border border-border-subtle rounded-xl flex flex-col md:flex-row items-center gap-space-lg p-space-lg transition-all hover:border-primary/20">
-        <div className="relative w-full md:w-48 h-64 flex-shrink-0">
+        <div className="relative w-36 md:w-48 aspect-[2/3] md:h-64 flex-shrink-0">
           <BookCover
             title={book.title}
             coverUrl={book.coverUrl}
             progressPercent={percent}
-            className="w-full h-full !aspect-auto md:w-full md:aspect-[2/3] md:h-auto"
+            className="w-full h-full"
           />
         </div>
         <div className="flex-1 flex flex-col justify-center py-space-sm w-full">

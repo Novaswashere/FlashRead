@@ -13,16 +13,27 @@ import { PlaybackSnapshot, PlaybackActions } from "../engine/types";
  */
 export function useRsvpEngine(
   text: string,
-  initialWpm?: number
+  initialWpm?: number,
+  smartPauseEnabled?: boolean
 ): { snapshot: PlaybackSnapshot; actions: PlaybackActions } {
   const controllerRef = useRef<PlaybackController | null>(null);
 
   // Lazily create the controller once
   if (controllerRef.current === null) {
-    controllerRef.current = new PlaybackController(text, { wpm: initialWpm });
+    controllerRef.current = new PlaybackController(text, {
+      wpm: initialWpm,
+      smartPause: smartPauseEnabled,
+    });
   }
 
   const controller = controllerRef.current;
+
+  // Sync smartPauseEnabled setting when it changes
+  useEffect(() => {
+    if (smartPauseEnabled !== undefined) {
+      controller.setSmartPause(smartPauseEnabled);
+    }
+  }, [controller, smartPauseEnabled]);
 
   // Cleanup on unmount — destroy is called exactly once
   useEffect(() => {
@@ -50,6 +61,7 @@ export function useRsvpEngine(
       pause: () => controller.pause(),
       seek: (index: number) => controller.seek(index),
       setWpm: (wpm: number) => controller.setWpm(wpm),
+      setSmartPause: (enabled: boolean) => controller.setSmartPause(enabled),
     }),
     [controller]
   );

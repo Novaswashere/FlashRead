@@ -31,8 +31,8 @@ export function getDelayMultiplier(word: string): number {
  *
  *   duration = (60000 / wpm) * multiplier
  */
-export function getWordDurationMs(wpm: number, word: string): number {
+export function getWordDurationMs(wpm: number, word: string, smartPause: boolean = true): number {
   if (wpm <= 0) return 0;
   const baseMs = 60000 / wpm;
-  return baseMs * getDelayMultiplier(word);
+  return baseMs * (smartPause ? getDelayMultiplier(word) : 1.0);
 }
