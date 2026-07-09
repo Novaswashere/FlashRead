@@ -1,1 +1,0 @@
-This is a speed reading test chapter. It contains some words that should flash on screen. We are testing Playwright E2E browser automation functionality for FlashRead.

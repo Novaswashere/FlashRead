@@ -31,7 +31,11 @@ export const LibraryList: React.FC<LibraryListProps> = ({
           >
             <div className="flex items-center gap-space-md">
               <div className="w-10 h-14 relative shrink-0">
-                <BookCover title={book.title} coverUrl={book.coverUrl} />
+                <BookCover
+                  title={book.title}
+                  coverUrl={book.coverUrl}
+                  coverAssetId={book.coverAssetId}
+                />
               </div>
               <div className="flex flex-col text-left">
                 <span className="font-body-md text-on-surface font-semibold group-hover:text-primary transition-colors line-clamp-1">

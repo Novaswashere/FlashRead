@@ -11,6 +11,7 @@ export interface Book {
   author: string;
   format: "epub" | "pdf" | "txt" | "pasted";
   coverUrl?: string;
+  coverAssetId?: string;
   chapterCount: number;
   createdAt: string;
 }

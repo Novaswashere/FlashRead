@@ -28,6 +28,7 @@ export const ContinueReadingHero: React.FC<ContinueReadingHeroProps> = ({
           <BookCover
             title={book.title}
             coverUrl={book.coverUrl}
+            coverAssetId={book.coverAssetId}
             progressPercent={percent}
             className="w-full h-full"
           />

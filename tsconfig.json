@@ -25,6 +25,8 @@
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": [
     "node_modules",
+    ".agents",
+    ".superpowers",
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     "src/**/*.spec.ts",

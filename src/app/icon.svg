@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="100%" height="100%" fill="none">
+  <!-- Gradients -->
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    
+    <!-- Neon Accent Gradient (Cyan to Emerald) -->
+    <linearGradient id="neon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    
+    <!-- Soft Glow Filter -->
+    <filter id="neon-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.2" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background rounded card -->
+  <rect width="32" height="32" rx="8" fill="url(#bg-grad)" stroke="#1e293b" stroke-width="1.2" />
+
+  <!-- Stylized Book Pages background -->
+  <path d="M 6 22 L 6 10 C 6 8.5, 11 8.5, 16 10 C 21 8.5, 26 8.5, 26 10 L 26 22 C 26 20.5, 21 20.5, 16 22 C 11 20.5, 6 20.5, 6 22 Z" fill="#1e293b" opacity="0.35" />
+  <path d="M 16 10 L 16 22" stroke="#334155" stroke-width="1.2" stroke-linecap="round" />
+
+  <!-- Speed Reading Focus Line (Center) -->
+  <line x1="8" y1="13" x2="13" y2="13" stroke="#334155" stroke-width="1" stroke-linecap="round" opacity="0.7" />
+  <line x1="19" y1="13" x2="24" y2="13" stroke="#334155" stroke-width="1" stroke-linecap="round" opacity="0.7" />
+  <line x1="8" y1="18" x2="13" y2="18" stroke="#334155" stroke-width="1" stroke-linecap="round" opacity="0.7" />
+  <line x1="19" y1="18" x2="24" y2="18" stroke="#334155" stroke-width="1" stroke-linecap="round" opacity="0.7" />
+
+  <!-- Glowing Lightning Bolt (Flash/Speed Concept) -->
+  <path d="M 19 3 L 10 15.5 L 15 15.5 L 12 29 L 22 13.5 L 16 13.5 L 19 3 Z" fill="url(#neon-grad)" filter="url(#neon-glow)" />
+</svg>

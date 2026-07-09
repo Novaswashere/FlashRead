@@ -22,6 +22,7 @@ export const BookCard: React.FC<BookCardProps> = ({
         <BookCover
           title={book.title}
           coverUrl={book.coverUrl}
+          coverAssetId={book.coverAssetId}
           progressPercent={progressPercent}
         />
       </div>

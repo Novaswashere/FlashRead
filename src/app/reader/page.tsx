@@ -100,6 +100,10 @@ function ReaderInner({
   const currentChapter = parsedBook.chapters[currentChapterIndex];
   const hasNextChapter = currentChapterIndex < chaptersCount - 1;
   const isChapterFinished = snapshot.state === "completed";
+  const isEmptyChapter =
+    !currentChapter ||
+    currentChapter.wordCount === 0 ||
+    !currentChapter.content.trim();
 
   // Handle Autoplay Next Chapter countdown
   useEffect(() => {
@@ -168,41 +172,83 @@ function ReaderInner({
       />
 
       {/* Chapter navigation hotkeys in header */}
-      <div className="absolute top-20 right-6 flex gap-2 z-40">
+      <div className="absolute top-20 right-6 flex gap-2 z-40 items-center">
         <button
           onClick={handlePrevChapter}
           disabled={currentChapterIndex === 0}
-          className="p-1.5 rounded bg-surface-container dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 hover:border-border-subtle/80 dark:hover:border-zinc-700 disabled:opacity-30 transition text-on-surface-variant dark:text-zinc-400 active:scale-95 cursor-pointer"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-surface-container dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 hover:border-border-subtle/80 dark:hover:border-zinc-700 disabled:opacity-30 transition text-on-surface-variant dark:text-zinc-400 active:scale-95 cursor-pointer text-xs font-semibold"
           title="Previous Chapter"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Prev Chapter</span>
         </button>
         <button
           onClick={handleNextChapter}
           disabled={!hasNextChapter}
-          className="p-1.5 rounded bg-surface-container dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 hover:border-border-subtle/80 dark:hover:border-zinc-700 disabled:opacity-30 transition text-on-surface-variant dark:text-zinc-400 active:scale-95 cursor-pointer"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-surface-container dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 hover:border-border-subtle/80 dark:hover:border-zinc-700 disabled:opacity-30 transition text-on-surface-variant dark:text-zinc-400 active:scale-95 cursor-pointer text-xs font-semibold"
           title="Next Chapter"
         >
-          <ArrowRight className="h-4 w-4" />
+          <span className="hidden sm:inline">Next Chapter</span>
+          <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>
 
       <main className="flex-grow flex items-center justify-center w-full px-space-md relative">
         <ReaderCanvas
-          onCanvasClick={() =>
-            snapshot.state === "playing" ? actions.pause() : actions.play()
-          }
-          orpEnabled={settings.orpEnabled}
+          onCanvasClick={() => {
+            if (isEmptyChapter) return;
+            snapshot.state === "playing" ? actions.pause() : actions.play();
+          }}
+          orpEnabled={settings.orpEnabled && !isEmptyChapter}
         >
-          <ReaderWordDisplay
-            word={snapshot.currentWord}
-            orpIndex={snapshot.orpIndex}
-            font={settings.font}
-            fontSize={settings.fontSize}
-            orpEnabled={settings.orpEnabled}
-          />
-          {snapshot.state === "playing" && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-32 h-1 bg-primary/20 blur-xl"></div>
+          {isEmptyChapter ? (
+            <div className="max-w-[400px] w-full bg-white/75 dark:bg-zinc-900/75 border border-zinc-200 dark:border-zinc-800/80 backdrop-blur-md rounded-2xl p-6 text-center shadow-xl animate-in fade-in duration-200 flex flex-col items-center justify-center gap-4 text-on-surface">
+              <div className="h-12 w-12 bg-primary/10 dark:bg-cyan-950 border border-primary/20 dark:border-cyan-800 rounded-full flex items-center justify-center text-primary dark:text-cyan-400">
+                <span className="material-symbols-outlined text-2xl">image</span>
+              </div>
+              <h3 className="text-base font-bold">Visual Page / Illustration</h3>
+              <p className="text-on-surface-variant text-xs leading-relaxed">
+                This chapter contains no readable text content (likely a cover page or drawing illustration) and cannot be read using rapid serial visual presentation (RSVP) mode.
+              </p>
+              <div className="flex gap-3 w-full mt-2">
+                {currentChapterIndex > 0 && (
+                  <button
+                    onClick={handlePrevChapter}
+                    className="flex-1 px-3 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold border border-border-subtle transition cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <ArrowLeft className="h-3 w-3" /> Prev Chapter
+                  </button>
+                )}
+                {hasNextChapter ? (
+                  <button
+                    onClick={handleNextChapter}
+                    className="flex-1 px-3 py-2 rounded-lg bg-primary text-on-primary hover:brightness-110 text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    Next Chapter <ArrowRight className="h-3 w-3" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleBack}
+                    className="flex-1 px-3 py-2 rounded-lg bg-primary text-on-primary hover:brightness-110 text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Library className="h-3 w-3" /> Library
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <>
+              <ReaderWordDisplay
+                word={snapshot.currentWord}
+                orpIndex={snapshot.orpIndex}
+                font={settings.font}
+                fontSize={settings.fontSize}
+                orpEnabled={settings.orpEnabled}
+              />
+              {snapshot.state === "playing" && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-32 h-1 bg-primary/20 blur-xl"></div>
+              )}
+            </>
           )}
         </ReaderCanvas>
 

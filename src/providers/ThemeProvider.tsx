@@ -17,8 +17,34 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
+    // 1. Try to read theme from settings first to prevent out-of-sync settings
+    const savedSettings = localStorage.getItem("flashread_settings");
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings);
+        if (
+          parsed.theme &&
+          (parsed.theme === "light" ||
+            parsed.theme === "dark" ||
+            parsed.theme === "sepia" ||
+            parsed.theme === "system")
+        ) {
+          setThemeState(parsed.theme);
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to parse settings for theme", e);
+      }
+    }
+
+    // 2. Fallback to standalone theme
     const saved = localStorage.getItem("flashread_theme") as Theme;
-    if (saved === "light" || saved === "dark" || saved === "sepia" || saved === "system") {
+    if (
+      saved === "light" ||
+      saved === "dark" ||
+      saved === "sepia" ||
+      saved === "system"
+    ) {
       setThemeState(saved);
     }
   }, []);

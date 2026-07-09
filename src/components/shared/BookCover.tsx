@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { storageService } from "@/services/storage";
 
 export interface BookCoverProps {
   title: string;
   coverUrl?: string;
+  coverAssetId?: string;
   progressPercent?: number;
   className?: string;
 }
@@ -11,9 +13,34 @@ export interface BookCoverProps {
 export const BookCover: React.FC<BookCoverProps> = ({
   title,
   coverUrl,
+  coverAssetId,
   progressPercent,
   className,
 }) => {
+  const [resolvedCoverUrl, setResolvedCoverUrl] = useState<string | undefined>(coverUrl);
+
+  useEffect(() => {
+    if (coverAssetId) {
+      let active = true;
+      async function loadAssetUrl() {
+        try {
+          const url = await storageService.assets.getAssetUrl(coverAssetId);
+          if (url && active) {
+            setResolvedCoverUrl(url);
+          }
+        } catch (e) {
+          console.error("Failed to load cover asset URL:", e);
+        }
+      }
+      loadAssetUrl();
+      return () => {
+        active = false;
+      };
+    } else {
+      setResolvedCoverUrl(coverUrl);
+    }
+  }, [coverAssetId, coverUrl]);
+
   return (
     <div
       className={cn(
@@ -21,9 +48,9 @@ export const BookCover: React.FC<BookCoverProps> = ({
         className
       )}
     >
-      {coverUrl ? (
+      {resolvedCoverUrl ? (
         <img
-          src={coverUrl}
+          src={resolvedCoverUrl}
           alt={`Cover of ${title}`}
           className="w-full h-full object-cover"
           loading="lazy"

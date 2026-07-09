@@ -199,7 +199,7 @@ export default function ImportPage() {
         author: editedAuthor.trim() || "Unknown Author",
         format: fileFormat,
         chapterCount: parsedBook.chapters.length,
-        coverUrl: coverPreviewUrl || undefined,
+        coverAssetId: parsedBook.metadata.coverAssetId || undefined,
         createdAt: new Date().toISOString(),
       };
 
@@ -282,7 +282,7 @@ export default function ImportPage() {
 
         {/* PARSING STATE */}
         {state === "PARSING" && (
-          <div className="backdrop-blur-md bg-zinc-900/60 border border-zinc-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[350px] shadow-2xl relative overflow-hidden">
+          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 flex flex-col items-center justify-center min-h-[350px] shadow-2xl relative overflow-hidden text-on-surface">
             <div
               className="absolute top-0 left-0 h-1 bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-300"
               style={{ width: `${progress}%` }}
@@ -290,9 +290,9 @@ export default function ImportPage() {
 
             <Loader2 className="h-12 w-12 text-cyan-500 animate-spin mb-6" />
             <h3 className="text-xl font-semibold mb-2">Ingesting Document</h3>
-            <p className="text-zinc-400 text-sm mb-6">{statusText}</p>
+            <p className="text-on-surface-variant text-sm mb-6">{statusText}</p>
 
-            <div className="w-full max-w-md bg-zinc-800 rounded-full h-2.5 mb-8 overflow-hidden">
+            <div className="w-full max-w-md bg-surface-container-high rounded-full h-2.5 mb-8 overflow-hidden">
               <div
                 className="bg-cyan-500 h-2.5 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
@@ -301,7 +301,7 @@ export default function ImportPage() {
 
             <button
               onClick={handleAbort}
-              className="px-6 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium border border-zinc-700 transition"
+              className="px-6 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer"
             >
               Cancel Import
             </button>
@@ -387,7 +387,7 @@ export default function ImportPage() {
             <div className="flex gap-4 justify-end border-t border-zinc-800 pt-6">
               <button
                 onClick={handleCancelPreview}
-                className="px-6 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium border border-zinc-700 transition"
+                className="px-6 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -403,10 +403,10 @@ export default function ImportPage() {
 
         {/* SAVING STATE */}
         {state === "SAVING" && (
-          <div className="backdrop-blur-md bg-zinc-900/60 border border-zinc-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px] shadow-2xl">
+          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px] shadow-2xl text-on-surface">
             <Loader2 className="h-12 w-12 text-emerald-500 animate-spin mb-6" />
             <h3 className="text-xl font-semibold mb-2">Saving to Library</h3>
-            <p className="text-zinc-400 text-sm">
+            <p className="text-on-surface-variant text-sm">
               Persisting document indices to local IndexedDB...
             </p>
           </div>
@@ -414,33 +414,33 @@ export default function ImportPage() {
 
         {/* ERROR STATE */}
         {state === "ERROR" && (
-          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 shadow-2xl">
+          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 shadow-2xl text-on-surface">
             <div className="flex items-center gap-3 text-red-500 mb-6 pb-4 border-b border-border-subtle">
               <ShieldAlert className="h-8 w-8 text-red-500" />
               <div>
                 <h3 className="text-xl font-semibold text-on-surface">
                   Parser Exception
                 </h3>
-                <span className="text-xs text-red-400 uppercase tracking-wider font-semibold font-mono">
+                <span className="text-xs text-red-500 dark:text-red-400 uppercase tracking-wider font-semibold font-mono">
                   {errorType}
                 </span>
               </div>
             </div>
 
-            <div className="bg-surface-container-lowest/60 border border-red-950/40 rounded-xl p-6 text-on-surface-variant text-sm mb-8 leading-relaxed">
+            <div className="bg-surface-container-lowest/60 border border-red-500/20 dark:border-red-950/40 rounded-xl p-6 text-on-surface-variant text-sm mb-8 leading-relaxed">
               {errorMessage}
             </div>
 
             <div className="flex gap-4 justify-end">
               <button
                 onClick={() => setState("IDLE")}
-                className="px-6 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium border border-zinc-700 transition"
+                className="px-6 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer"
               >
                 Close
               </button>
               <button
                 onClick={() => setState("IDLE")}
-                className="px-6 py-2.5 rounded-lg bg-red-950/30 hover:bg-red-950/50 text-red-400 text-sm font-semibold border border-red-900/40 transition"
+                className="px-6 py-2.5 rounded-lg bg-red-500/10 dark:bg-red-500/20 hover:bg-red-500/20 dark:hover:bg-red-500/30 text-red-600 dark:text-red-400 text-sm font-semibold border border-red-200 dark:border-red-900/50 transition cursor-pointer"
               >
                 Try Again
               </button>

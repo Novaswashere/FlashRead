@@ -33,7 +33,7 @@ export class PdfParser implements IDocumentParser {
     const pdfjs = await import("pdfjs-dist");
 
     if (typeof window !== "undefined") {
-      pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+      pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
     }
 
     let arrayBuffer: ArrayBuffer;
