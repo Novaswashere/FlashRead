@@ -13,10 +13,30 @@ export const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
   onThemeSelect,
 }) => {
   const shortcuts = [
-    { keys: ["Space"], description: "Play / Pause playback" },
-    { keys: ["←", "→"], description: "Seek backward / forward" },
-    { keys: ["↑", "↓"], description: "Increase / decrease speed" },
-    { keys: ["Esc"], description: "Exit reader mode" },
+    {
+      icon: "play_circle",
+      label: "Play / Pause",
+      description: "Toggle RSVP word flashing",
+      keys: ["Space"],
+    },
+    {
+      icon: "swap_horizontal_circle",
+      label: "Seek Navigation",
+      description: "Step back/forward 10 words",
+      keys: ["←", "→"],
+    },
+    {
+      icon: "speed",
+      label: "Adjust WPM",
+      description: "Increase/decrease speed",
+      keys: ["↑", "↓"],
+    },
+    {
+      icon: "cancel",
+      label: "Exit Reader",
+      description: "Close the reading session",
+      keys: ["Esc"],
+    },
   ];
 
   return (
@@ -52,23 +72,33 @@ export const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
           >
             Keyboard Shortcuts
           </h4>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2.5 bg-surface-container-low dark:bg-surface-dark border border-border-subtle dark:border-outline-variant rounded-xl p-space-md">
             {shortcuts.map((sh, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between py-1 border-b border-border-subtle last:border-b-0"
+                className="flex items-start justify-between py-2 border-b border-border-subtle/50 dark:border-outline-variant/30 last:border-b-0 gap-space-sm"
               >
-                <span
-                  className="text-sm"
-                  style={{ color: "var(--on-surface-variant)" }}
-                >
-                  {sh.description}
-                </span>
-                <div className="flex gap-1">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-secondary dark:text-outline text-lg">
+                    {sh.icon}
+                  </span>
+                  <div className="flex flex-col text-left">
+                    <span className="text-xs font-bold text-on-surface">
+                      {sh.label}
+                    </span>
+                    <span
+                      className="text-[10px] mt-0.5 leading-tight"
+                      style={{ color: "var(--on-surface-variant)" }}
+                    >
+                      {sh.description}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-1.5 flex-shrink-0 mt-0.5">
                   {sh.keys.map((k, kIdx) => (
                     <kbd
                       key={kIdx}
-                      className="px-2 py-1 bg-surface-container-high border border-border-subtle rounded text-xs font-label-mono text-on-surface font-semibold"
+                      className="px-2 py-0.5 bg-surface-container-high dark:bg-zinc-800 border border-border-subtle dark:border-zinc-700 rounded text-[10px] font-label-mono text-on-surface dark:text-zinc-200 font-bold shadow-sm"
                     >
                       {k}
                     </kbd>
