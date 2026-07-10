@@ -88,9 +88,7 @@ design.md
 stich_homepage/
 stich_rebrand_export/
 volumes/
-tests/e2e/slime-test.js
-tests/e2e/slime-test-results.json
-tests/fixtures/
+tests/
 User-Guide.md
 
 # Workspace specific documentation and runner scripts

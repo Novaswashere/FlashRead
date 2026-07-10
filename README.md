@@ -72,15 +72,6 @@ Here is a list of available command-line utilities:
 * `npm run typecheck` - Compiles TypeScript files to verify type-safety.
 * `npm run format` - Automatically formats all files using Prettier.
 
-### 🧪 Running End-to-End Tests
-To run the automated Playwright E2E integration test suite:
-1. Ensure the development server is active on `http://localhost:3000`.
-2. Run the tests:
-   ```bash
-   npx playwright test
-   ```
-   *(Or run our local execution runner: `node tests/e2e/e2e.spec.js`)*
-
 ---
 
 ## 📁 Repository Overview
@@ -94,4 +85,3 @@ To run the automated Playwright E2E integration test suite:
   * `settings/` - Customization options, WPM defaults, and font styling controls.
 * `src/providers/` - React Contexts for settings, libraries, and toasts.
 * `src/services/` - Parsing services (PDF, EPUB, TXT) and IndexedDB storage handlers.
-* `tests/` - Playwright automation scripts and upload fixture suites.
