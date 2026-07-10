@@ -41,6 +41,7 @@ lerna-debug.log*
 secrets.json
 credentials.json
 client_secret.json
+.env.example
 .npmrc
 .yarnrc
 
