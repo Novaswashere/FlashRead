@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ReaderProvider, useReaderContext } from "@/providers/ReaderProvider";
 import { useSettingsContext } from "@/providers/SettingsProvider";
@@ -107,6 +107,18 @@ function ReaderInner({
     currentChapter.wordCount === 0 ||
     !currentChapter.content.trim();
 
+  const handleNextChapter = useCallback(() => {
+    if (hasNextChapter) {
+      onChapterChange(currentChapterIndex + 1);
+    }
+  }, [hasNextChapter, currentChapterIndex, onChapterChange]);
+
+  const handlePrevChapter = useCallback(() => {
+    if (currentChapterIndex > 0) {
+      onChapterChange(currentChapterIndex - 1);
+    }
+  }, [currentChapterIndex, onChapterChange]);
+
   // Handle Autoplay Next Chapter countdown
   useEffect(() => {
     if (!isChapterFinished || !hasNextChapter || isAutoplayPaused) return;
@@ -124,16 +136,16 @@ function ReaderInner({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isChapterFinished, currentChapterIndex, isAutoplayPaused]);
+  }, [isChapterFinished, currentChapterIndex, isAutoplayPaused, hasNextChapter, handleNextChapter]);
 
   // Sync callbacks
   useEffect(() => {
     onWordIndexChange(snapshot.currentIndex);
-  }, [snapshot.currentIndex]);
+  }, [snapshot.currentIndex, onWordIndexChange]);
 
   useEffect(() => {
     onWpmChange(snapshot.wpm);
-  }, [snapshot.wpm]);
+  }, [snapshot.wpm, onWpmChange]);
 
   const handleThemeChange = (newTheme: "light" | "dark") => {
     setTheme(newTheme);
@@ -144,17 +156,7 @@ function ReaderInner({
     router.push("/");
   };
 
-  const handleNextChapter = () => {
-    if (hasNextChapter) {
-      onChapterChange(currentChapterIndex + 1);
-    }
-  };
-
-  const handlePrevChapter = () => {
-    if (currentChapterIndex > 0) {
-      onChapterChange(currentChapterIndex - 1);
-    }
-  };
+  // Navigation functions defined using useCallback above
 
   const handleProgressScrub = (index: number) => {
     actions.seek(index);
@@ -523,7 +525,7 @@ function ReaderLoader() {
     }
 
     loadBookData();
-  }, [bookIdParam]);
+  }, [bookIdParam, showGlobalToast]);
 
   // Debounced progress saving effect
   useEffect(() => {
@@ -573,6 +575,12 @@ function ReaderLoader() {
     activeBookId,
     parsedBook,
     isLoading,
+    error,
+    progress?.bookmarks,
+    progress?.highlights,
+    progress?.notes,
+    progress?.readingTime,
+    showGlobalToast,
   ]);
 
   if (isLoading) {
