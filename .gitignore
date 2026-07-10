@@ -91,3 +91,9 @@ tests/e2e/slime-test.js
 tests/e2e/slime-test-results.json
 tests/fixtures/
 User-Guide.md
+
+# Workspace specific documentation and runner scripts
+UX_IMPLEMENTATION_PROGRESS.md
+TESTING.md
+docs/
+Scripts/

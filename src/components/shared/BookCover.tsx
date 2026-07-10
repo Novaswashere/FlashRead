@@ -22,7 +22,7 @@ export const BookCover: React.FC<BookCoverProps> = ({
   useEffect(() => {
     if (coverAssetId) {
       let active = true;
-      async function loadAssetUrl() {
+      const loadAssetUrl = async () => {
         try {
           const url = await storageService.assets.getAssetUrl(coverAssetId);
           if (url && active) {
@@ -31,7 +31,7 @@ export const BookCover: React.FC<BookCoverProps> = ({
         } catch (e) {
           console.error("Failed to load cover asset URL:", e);
         }
-      }
+      };
       loadAssetUrl();
       return () => {
         active = false;

@@ -6,7 +6,7 @@ const fs = require('fs');
 const helpers = require('./lib/helpers');
 
 const TARGET_URL = 'http://localhost:3000';
-const SCREENSHOT_DIR = 'C:/Users/ameen/Desktop/FlashRead-v1/tests/fixtures';
+const SCREENSHOT_DIR = 'C:/Users/ameen/Desktop/Flashread-v1/tests/fixtures';
 
 // Helper to wait
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -41,13 +41,58 @@ async function runTests() {
   setupFixtures();
 
   // Launch browser
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 }
   });
   const page = await context.newPage();
 
+  // Capture console logs and errors
+  page.on('console', msg => console.log('Browser Log:', msg.text()));
+  page.on('pageerror', err => console.error('Browser Page Error:', err.message));
+
   try {
+    // Navigate directly to target URL. Playwright starts with a clean context.
+    await page.goto(TARGET_URL);
+
+    // ----------------------------------------------------
+    // Test Case 0: Verify Onboarding Checklist Empty State & Settings visit tracker
+    // ----------------------------------------------------
+    console.log('\n--- Test 0: Verify Onboarding Checklist & Settings tracker ---');
+    await page.waitForSelector('text=Getting Started');
+    console.log('✅ Onboarding Checklist "Getting Started" is visible.');
+
+    // Assert initially 0 of 3 completed
+    const progressText = await page.locator('text=completed').innerText();
+    console.log(`Initial progress status: "${progressText}"`);
+    if (!progressText.includes('0 of 3 completed')) {
+      throw new Error(`Expected '0 of 3 completed' progress on empty library, got: ${progressText}`);
+    }
+    
+    // Take onboarding dashboard screenshot
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'onboarding-homepage.png') });
+    console.log('📸 Saved onboarding screenshot.');
+
+    // Click settings action link in checklist to complete setting visit step
+    console.log('Navigating to settings via onboarding action link...');
+    await page.click('button:has-text("Go to Settings")');
+    await page.waitForURL(/.*\/settings/);
+    console.log('✅ Settings page loaded.');
+    await delay(1000); // Allow mount effect to track visit
+    
+    // Return to homepage
+    console.log('Navigating back to homepage...');
+    await page.goto(TARGET_URL);
+    await page.waitForSelector('text=Getting Started');
+    
+    // Assert 1 of 3 completed (settings visited is marked complete)
+    const updatedProgressText = await page.locator('text=completed').innerText();
+    console.log(`Updated progress status: "${updatedProgressText}"`);
+    if (!updatedProgressText.includes('1 of 3 completed')) {
+      throw new Error(`Expected '1 of 3 completed' after settings page visit, got: ${updatedProgressText}`);
+    }
+    console.log('✅ Onboarding checklist settings visit completion verified successfully.');
+
     // ----------------------------------------------------
     // Test Case 1: Load Homepage and Verify Theme styling
     // ----------------------------------------------------
@@ -291,7 +336,7 @@ async function runTests() {
     await page.waitForSelector('text=EMPTY_DOCUMENT');
     console.log('✅ Correctly caught EMPTY_DOCUMENT exception.');
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, '09-error-empty.png') });
-    await page.click('button:has-text("Close")');
+    await page.click('button:has-text("Try Again")');
 
     // B. Unsupported format
     console.log('B. Uploading Unsupported PNG File...');
@@ -299,15 +344,24 @@ async function runTests() {
     await page.waitForSelector('text=UNSUPPORTED_FORMAT');
     console.log('✅ Correctly caught UNSUPPORTED_FORMAT exception.');
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, '10-error-unsupported.png') });
-    await page.click('button:has-text("Close")');
+    await page.click('button:has-text("Try Again")');
 
     // C. Corrupted EPUB
     console.log('C. Uploading Corrupted EPUB File...');
     await page.setInputFiles('input[type="file"]', path.join(SCREENSHOT_DIR, 'corrupted.epub'));
     await page.waitForSelector('text=CORRUPTED_FILE');
     console.log('✅ Correctly caught CORRUPTED_FILE exception.');
+    
+    // Assert user-friendly description text is visible for corrupted files
+    const errorDescLocator = page.locator('text=The file was corrupted. The file\'s internal structure seems to be corrupted. Try downloading or generating a fresh copy of the file and try again.');
+    if (await errorDescLocator.isVisible()) {
+      console.log('✅ Verified: Friendly, user-centric description message is displayed for corrupted files.');
+    } else {
+      throw new Error('❌ Corrupted file error screen did not display the expected friendly description text.');
+    }
+    
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, '11-error-corrupted.png') });
-    await page.click('button:has-text("Close")');
+    await page.click('button:has-text("Try Again")');
 
     // D. Direct Navigation with Invalid Book ID
     console.log('D. Navigating directly with invalid book ID...');

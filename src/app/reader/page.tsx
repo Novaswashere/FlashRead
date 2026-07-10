@@ -17,6 +17,8 @@ import { AppearanceSettingsModal } from "@/features/reader/components/Appearance
 import { PlaybackSettingsModal } from "@/features/reader/components/PlaybackSettingsModal";
 import { storageService } from "@/services/storage";
 import { Book, ParsedBook, ReadingProgress as ProgressType } from "@/types";
+import { ReaderSkeleton } from "@/features/reader/components/ReaderSkeleton";
+import { useToast } from "@/providers/ToastProvider";
 import {
   Loader2,
   ArrowLeft,
@@ -442,6 +444,7 @@ function ReaderInner({
 }
 
 function ReaderLoader() {
+  const { showToast: showGlobalToast } = useToast();
   const searchParams = useSearchParams();
   const bookIdParam = searchParams.get("id") || "";
   const router = useRouter();
@@ -506,6 +509,10 @@ function ReaderLoader() {
           setCurrentChapterIndex(fetchedProgress.currentChapterIndex || 0);
           setCurrentWordIndex(fetchedProgress.currentWordIndex || 0);
           setCurrentWpm(fetchedProgress.wpm || 350);
+          
+          if (fetchedProgress.currentChapterIndex > 0 || fetchedProgress.currentWordIndex > 0) {
+            showGlobalToast(`Reading progress restored. Resumed at Chapter ${fetchedProgress.currentChapterIndex + 1}`, "success");
+          }
         }
 
         setIsLoading(false);
@@ -549,7 +556,12 @@ function ReaderLoader() {
         readingTime: progress?.readingTime || 0,
       };
 
-      await storageService.progress.save(progressUpdate);
+      try {
+        await storageService.progress.save(progressUpdate);
+      } catch (err) {
+        console.error("Autosave Failure:", err);
+        showGlobalToast("Unable to save progress. Retrying in background...", "error");
+      }
     };
 
     const handler = setTimeout(saveProgress, 1500);
@@ -564,12 +576,7 @@ function ReaderLoader() {
   ]);
 
   if (isLoading) {
-    return (
-      <div className="bg-background min-h-screen text-on-background flex flex-col items-center justify-center">
-        <Loader2 className="h-10 w-10 text-cyan-500 animate-spin mb-4" />
-        <span className="text-zinc-400 text-sm">Opening reader canvas...</span>
-      </div>
-    );
+    return <ReaderSkeleton />;
   }
 
   if (error || !book || !parsedBook || !progress) {
@@ -631,16 +638,7 @@ function ReaderLoader() {
 
 export default function ReaderPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="bg-background min-h-screen text-on-background flex flex-col items-center justify-center">
-          <Loader2 className="h-10 w-10 text-cyan-500 animate-spin mb-4" />
-          <span className="text-zinc-400 text-sm font-medium">
-            Booting engine...
-          </span>
-        </div>
-      }
-    >
+    <Suspense fallback={<ReaderSkeleton />}>
       <ReaderLoader />
     </Suspense>
   );

@@ -9,25 +9,32 @@ import { LibraryFilters } from "@/features/library/components/LibraryFilters";
 import { LibraryList } from "@/features/library/components/LibraryList";
 import { EmptyLibraryState } from "@/features/library/components/EmptyLibraryState";
 import { LoadingLibraryState } from "@/features/library/components/LoadingLibraryState";
+import { SearchEmptyState } from "@/features/library/components/SearchEmptyState";
+import { useToast } from "@/providers/ToastProvider";
+import { findSpellingSuggestion } from "@/lib/spelling";
 import { Book, ReadingProgress as ProgressType } from "@/types";
 import { Plus } from "lucide-react";
 
 export default function LibraryPage() {
   const router = useRouter();
   const { books, isLoading, removeBook } = useLibraryContext();
+  const { showToast } = useToast();
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
-  const [progressMap, setProgressMap] = useState<Record<string, ProgressType>>(
-    {}
-  );
+  const [progressMap, setProgressMap] = useState<Record<string, ProgressType>>({});
 
   useEffect(() => {
     async function loadProgress() {
       const map: Record<string, ProgressType> = {};
       for (const b of books) {
-        const p = await storageService.progress.getById(b.id);
-        if (p) {
-          map[b.id] = p;
+        try {
+          const p = await storageService.progress.getById(b.id);
+          if (p) {
+            map[b.id] = p;
+          }
+        } catch (err) {
+          console.error(`Failed to load progress for book ${b.id}:`, err);
+          // Graceful degradation: continue loading the rest
         }
       }
       setProgressMap(map);
@@ -42,14 +49,19 @@ export default function LibraryPage() {
     router.push(`/reader?id=${book.id}`);
   };
 
-  const handleMoreActions = (book: Book, e: React.MouseEvent) => {
+  const handleMoreActions = async (book: Book, e: React.MouseEvent) => {
     e.preventDefault();
     if (
       confirm(
         `Are you sure you want to delete "${book.title}" from your library?`
       )
     ) {
-      removeBook(book.id);
+      try {
+        await removeBook(book.id);
+        showToast(`"${book.title}" deleted from library`, "success");
+      } catch (err) {
+        showToast("Failed to delete book from storage", "error");
+      }
     }
   };
 
@@ -63,6 +75,8 @@ export default function LibraryPage() {
     return matchesSearch && matchesFilter;
   });
 
+  const spellingSuggestion = findSpellingSuggestion(search, books);
+
   return (
     <main className="pt-24 pb-20 px-space-md md:px-space-xl max-w-[900px] mx-auto min-h-screen md:pl-72 text-left bg-background text-on-background">
       <LibrarySearch value={search} onChange={setSearch} />
@@ -73,8 +87,15 @@ export default function LibraryPage() {
 
       {isLoading ? (
         <LoadingLibraryState />
-      ) : filteredBooks.length === 0 ? (
+      ) : books.length === 0 ? (
         <EmptyLibraryState onImportClick={() => router.push("/import")} />
+      ) : filteredBooks.length === 0 ? (
+        <SearchEmptyState
+          query={search}
+          suggestion={spellingSuggestion}
+          onSuggestionClick={(s) => setSearch(s)}
+          onClear={() => setSearch("")}
+        />
       ) : (
         <LibraryList
           books={filteredBooks}

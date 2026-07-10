@@ -10,6 +10,8 @@ import { Toast } from "@/components/ui/Toast";
 import { parserService } from "@/services/parser";
 import { storageService } from "@/services/storage";
 import { useLibraryContext } from "@/providers/LibraryProvider";
+import { useToast } from "@/providers/ToastProvider";
+import { mapError, MappedError } from "@/lib/errorMapper";
 import { ParsedBook, Book, ReadingProgress } from "@/types";
 import { ParserError } from "@/lib/errors";
 import {
@@ -33,6 +35,8 @@ export default function ImportPage() {
   const [statusText, setStatusText] = useState("Initializing parser...");
   const [errorMessage, setErrorMessage] = useState("");
   const [errorType, setErrorType] = useState("");
+  const [mappedError, setMappedError] = useState<MappedError | null>(null);
+  const { showToast: showGlobalToast } = useToast();
 
   // Preview Data
   const [parsedBook, setParsedBook] = useState<ParsedBook | null>(null);
@@ -117,10 +121,13 @@ export default function ImportPage() {
       }
 
       console.error("Parser Ingestion Error:", err);
-      setErrorType(err.code || "UNKNOWN_ERROR");
-      setErrorMessage(
-        err.message || "An unexpected error occurred during document parsing."
-      );
+      const code = err.code || "UNKNOWN_ERROR";
+      const msg = err.message || "";
+      setErrorType(code);
+      setErrorMessage(msg);
+      
+      const mapped = mapError(code, msg);
+      setMappedError(mapped);
       setState("ERROR");
     }
   };
@@ -225,18 +232,13 @@ export default function ImportPage() {
       };
       await storageService.progress.save(initialProgress);
 
-      setToastMessage("Book imported successfully!");
-      setToastType("success");
-      setShowToast(true);
-
+      showGlobalToast("Book imported successfully!", "success");
       setTimeout(() => {
         router.push("/");
       }, 1000);
     } catch (err: any) {
       console.error("Storage Save Error:", err);
-      setToastMessage("Failed to save book to IndexedDB storage.");
-      setToastType("error");
-      setShowToast(true);
+      showGlobalToast("Failed to save book to IndexedDB storage.", "error");
       setState("PREVIEW");
     }
   };
@@ -413,36 +415,59 @@ export default function ImportPage() {
         )}
 
         {/* ERROR STATE */}
-        {state === "ERROR" && (
-          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 shadow-2xl text-on-surface">
+        {state === "ERROR" && mappedError && (
+          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 shadow-2xl text-on-surface animate-in fade-in duration-200">
             <div className="flex items-center gap-3 text-red-500 mb-6 pb-4 border-b border-border-subtle">
-              <ShieldAlert className="h-8 w-8 text-red-500" />
+              <ShieldAlert className="h-8 w-8 text-red-500 shrink-0" />
               <div>
-                <h3 className="text-xl font-semibold text-on-surface">
-                  Parser Exception
+                <h3 className="text-xl font-bold text-on-surface">
+                  {mappedError.title}
                 </h3>
-                <span className="text-xs text-red-500 dark:text-red-400 uppercase tracking-wider font-semibold font-mono">
-                  {errorType}
+                <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold font-mono block mt-0.5">
+                  Error Code: {errorType}
                 </span>
               </div>
             </div>
 
-            <div className="bg-surface-container-lowest/60 border border-red-500/20 dark:border-red-950/40 rounded-xl p-6 text-on-surface-variant text-sm mb-8 leading-relaxed">
-              {errorMessage}
+            <div className="bg-surface-container border border-border-subtle rounded-xl p-6 mb-8">
+              <p className="text-base text-on-surface leading-relaxed">
+                {mappedError.description}
+              </p>
             </div>
 
-            <div className="flex gap-4 justify-end">
+            <div className="flex flex-col sm:flex-row gap-3 justify-end border-t border-border-subtle pt-6">
               <button
-                onClick={() => setState("IDLE")}
-                className="px-6 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer"
+                onClick={() => {
+                  setMappedError(null);
+                  setState("IDLE");
+                  router.push("/");
+                }}
+                className="px-6 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer flex items-center justify-center gap-1.5"
               >
-                Close
+                Return to Dashboard
               </button>
+              
               <button
-                onClick={() => setState("IDLE")}
-                className="px-6 py-2.5 rounded-lg bg-red-500/10 dark:bg-red-500/20 hover:bg-red-500/20 dark:hover:bg-red-500/30 text-red-600 dark:text-red-400 text-sm font-semibold border border-red-200 dark:border-red-900/50 transition cursor-pointer"
+                onClick={() => {
+                  setMappedError(null);
+                  setState("IDLE");
+                }}
+                className="px-6 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer flex items-center justify-center gap-1.5"
               >
                 Try Again
+              </button>
+
+              <button
+                onClick={() => {
+                  setMappedError(null);
+                  setState("IDLE");
+                  if (fileInputRef.current) {
+                    fileInputRef.current.click();
+                  }
+                }}
+                className="px-6 py-2.5 rounded-lg bg-primary text-on-primary hover:brightness-110 font-bold text-sm transition cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                Choose Another File
               </button>
             </div>
           </div>

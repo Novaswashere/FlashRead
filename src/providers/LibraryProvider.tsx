@@ -30,8 +30,9 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(true);
       let list = await storageService.books.getAll();
 
-      // If first run and IndexedDB is empty, seed mock books
-      if (list.length === 0) {
+      // Disabled auto-seeding to ensure first-time users see the onboarding checklist
+      const isSeeded = true;
+      if (list.length === 0 && !isSeeded) {
         for (const b of MOCK_BOOKS) {
           await storageService.books.save(b);
 

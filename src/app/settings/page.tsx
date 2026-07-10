@@ -15,6 +15,12 @@ export default function SettingsPage() {
   const { setTheme } = useTheme();
   const { settings, updateSettings } = useSettingsContext();
 
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("flashread_settings_visited", "true");
+    }
+  }, []);
+
   const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
     setTheme(newTheme);
     updateSettings({ theme: newTheme });
