@@ -44,8 +44,8 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
       onDragLeave={handleDrag}
       onDrop={handleDrop}
       className={cn(
-        "relative w-full h-64 border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center bg-surface-container-low cursor-pointer transition-all hover:bg-surface-container-high mb-space-xl",
-        dragActive && "border-primary bg-primary-container/10"
+        "relative w-full h-64 border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center bg-surface-container-low cursor-pointer transition-all hover:bg-surface-container-high mb-lg",
+        dragActive && "border-primary bg-primary/5"
       )}
     >
       {isProcessing ? (
@@ -65,7 +65,7 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
           <p className="font-body-lg text-body-lg font-semibold text-on-surface">
             Drag &amp; drop files here
           </p>
-          <p className="text-on-surface-variant text-sm mt-2">
+          <p className="font-body-md text-body-md text-on-surface-variant mt-2">
             or tap to browse locally
           </p>
           <input

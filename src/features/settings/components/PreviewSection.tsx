@@ -21,7 +21,7 @@ export const PreviewSection: React.FC<PreviewSectionProps> = ({
       <div className="w-full mt-6 flex items-center justify-center select-none">
         <ReaderCanvas orpEnabled={orpEnabled} className="h-36 border border-border-subtle/40 bg-surface-container-low/50 dark:bg-surface-dark/30 rounded-lg shadow-inner">
           <ReaderWordDisplay
-            word="FlashRead"
+            word="ReadPilot"
             orpIndex={2}
             font={font}
             fontSize={fontSize}

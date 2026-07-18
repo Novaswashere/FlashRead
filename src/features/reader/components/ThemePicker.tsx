@@ -15,12 +15,12 @@ export const ThemePicker: React.FC<ThemePickerProps> = ({
       {
         id: "light",
         label: "Light",
-        class: "bg-[#FFFFFF] border-zinc-200 text-zinc-800",
+        class: "bg-surface-container-lowest border-outline-variant text-on-surface",
       },
       {
         id: "dark",
         label: "Dark",
-        class: "bg-[#0B0E14] border-[#1C202B] text-white",
+        class: "bg-inverse-surface border-outline-variant text-on-surface",
       },
     ];
 
@@ -34,7 +34,7 @@ export const ThemePicker: React.FC<ThemePickerProps> = ({
             "w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer",
             opt.class,
             currentTheme === opt.id
-              ? "ring-2 ring-primary ring-offset-2 scale-110"
+              ? "ring-2 ring-primary ring-offset-2 ring-offset-surface-container-lowest scale-110"
               : "hover:scale-105"
           )}
           title={opt.label}

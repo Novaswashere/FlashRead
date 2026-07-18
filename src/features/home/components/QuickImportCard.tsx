@@ -1,6 +1,4 @@
 import React from "react";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
 
 export interface QuickImportCardProps {
   onImportClick: () => void;
@@ -10,25 +8,29 @@ export const QuickImportCard: React.FC<QuickImportCardProps> = ({
   onImportClick,
 }) => {
   return (
-    <Card className="my-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md bg-primary-container/10 border-primary/20">
-      <div className="flex items-center gap-space-md text-left w-full sm:w-auto">
-        <span className="material-symbols-outlined text-primary text-4xl">
-          add_circle
+    <section className="glass-card border border-outline-variant/30 rounded-xl p-lg flex flex-col sm:flex-row items-center justify-between gap-md hover:border-primary/50 transition-all group animate-fade-in-up stagger-4">
+      <div className="flex items-center gap-md text-left w-full sm:w-auto">
+        <span
+          className="material-symbols-outlined text-primary text-4xl"
+          style={{ fontVariationSettings: "'FILL' 1" }}
+        >
+          publish
         </span>
         <div>
-          <h4 className="font-bold text-on-surface">Import New Book</h4>
-          <p className="text-sm text-on-surface-variant">
-            Add EPUB, PDF, TXT or clipboard text to get started.
+          <h4 className="font-headline-md text-headline-md font-bold text-on-surface">
+            Add More Books
+          </h4>
+          <p className="font-label-sm text-label-sm text-on-surface-variant">
+            Import EPUB, PDF, TXT files or paste text directly.
           </p>
         </div>
       </div>
-      <Button
-        variant="primary"
+      <button
         onClick={onImportClick}
-        className="w-full sm:w-auto shrink-0"
+        className="bg-primary text-on-primary rounded-lg font-label-md text-label-md px-lg py-3 hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-95 shrink-0"
       >
         Import Now
-      </Button>
-    </Card>
+      </button>
+    </section>
   );
 };

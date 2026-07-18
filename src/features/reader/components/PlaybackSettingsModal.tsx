@@ -39,23 +39,24 @@ export const PlaybackSettingsModal: React.FC<PlaybackSettingsModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-950/65 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-surface-container dark:bg-surface-dark border border-border-subtle dark:border-outline-variant rounded-2xl p-space-lg w-full max-w-sm text-left flex flex-col gap-space-lg shadow-2xl relative">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-on-surface/50 backdrop-blur-sm p-4 animate-fade-in-up">
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg w-full max-w-sm text-left flex flex-col gap-lg shadow-2xl relative">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border-subtle dark:border-outline-variant pb-3">
-          <h3 className="font-headline-md text-lg font-bold text-on-surface">
+        <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
+          <h3 className="font-headline-md text-headline-md text-on-surface">
             Playback Controls
           </h3>
           <button
             onClick={onClose}
-            className="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest p-1.5 rounded-full cursor-pointer transition-colors"
+            className="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-1.5 rounded-full cursor-pointer transition-colors"
+            aria-label="Close"
           >
             close
           </button>
         </div>
 
         {/* Toggles List */}
-        <div className="flex flex-col border border-border-subtle dark:border-outline-variant rounded-xl overflow-hidden divide-y divide-border-subtle dark:divide-outline-variant bg-surface-container-low dark:bg-surface-dark">
+        <div className="flex flex-col border border-outline-variant/30 rounded-xl overflow-hidden divide-y divide-outline-variant/30 bg-surface-container-low">
           {/* ORP Toggle */}
           <Switch
             icon="format_paint"
@@ -75,34 +76,39 @@ export const PlaybackSettingsModal: React.FC<PlaybackSettingsModalProps> = ({
               updateSettings({ smartPauseEnabled: e.target.checked })
             }
           />
+
+          {/* Reading Anchor Toggle */}
+          <Switch
+            icon="bookmarks"
+            label="Reading Anchor"
+            description="Show paragraph context below the reader for comprehension"
+            checked={settings.readingAnchorEnabled ?? false}
+            onChange={(e) =>
+              updateSettings({ readingAnchorEnabled: e.target.checked })
+            }
+          />
         </div>
 
         {/* Keyboard Shortcuts */}
-        <div className="flex flex-col gap-space-sm">
-          <h4
-            className="text-[10px] font-bold uppercase tracking-widest"
-            style={{ color: "var(--on-surface-variant)" }}
-          >
+        <div className="flex flex-col gap-sm">
+          <h4 className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
             Keyboard Shortcuts
           </h4>
-          <div className="flex flex-col gap-2.5 bg-surface-container-low dark:bg-surface-dark border border-border-subtle dark:border-outline-variant rounded-xl p-space-md">
+          <div className="flex flex-col gap-2.5 bg-surface-container-low border border-outline-variant/30 rounded-xl p-md">
             {shortcuts.map((sh, idx) => (
               <div
                 key={idx}
-                className="flex items-start justify-between py-2 border-b border-border-subtle/50 dark:border-outline-variant/30 last:border-b-0 gap-space-sm"
+                className="flex items-start justify-between py-2 border-b border-outline-variant/30 last:border-b-0 gap-sm"
               >
                 <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-secondary dark:text-outline text-lg">
+                  <span className="material-symbols-outlined text-outline text-lg">
                     {sh.icon}
                   </span>
                   <div className="flex flex-col text-left">
                     <span className="text-xs font-bold text-on-surface">
                       {sh.label}
                     </span>
-                    <span
-                      className="text-[10px] mt-0.5 leading-tight"
-                      style={{ color: "var(--on-surface-variant)" }}
-                    >
+                    <span className="text-[10px] mt-0.5 leading-tight text-on-surface-variant">
                       {sh.description}
                     </span>
                   </div>
@@ -111,7 +117,7 @@ export const PlaybackSettingsModal: React.FC<PlaybackSettingsModalProps> = ({
                   {sh.keys.map((k, kIdx) => (
                     <kbd
                       key={kIdx}
-                      className="px-2 py-0.5 bg-surface-container-high dark:bg-zinc-800 border border-border-subtle dark:border-zinc-700 rounded text-[10px] font-label-mono text-on-surface dark:text-zinc-200 font-bold shadow-sm"
+                      className="px-2 py-0.5 bg-surface-container-high border border-outline-variant/30 rounded text-[10px] font-label-md text-label-md text-on-surface font-bold"
                     >
                       {k}
                     </kbd>

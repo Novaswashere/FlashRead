@@ -10,7 +10,7 @@ export function mapError(code: string, rawMessage: string): MappedError {
     case "UNSUPPORTED_FORMAT":
       return {
         title: "Unsupported File Format",
-        description: "This file format is not supported. FlashRead only supports EPUB, PDF, and TXT files. Please convert your document into one of these formats and try again.",
+        description: "This file format is not supported. ReadPilot only supports EPUB, PDF, and TXT files. Please convert your document into one of these formats and try again.",
       };
     case "CORRUPTED_FILE":
       return {

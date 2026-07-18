@@ -1,4 +1,4 @@
-const DB_NAME = "FlashReadDB";
+const DB_NAME = "ReadPilotDB";
 const DB_VERSION = 1;
 
 export function getDB(): Promise<IDBDatabase> {

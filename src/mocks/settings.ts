@@ -10,4 +10,5 @@ export const MOCK_SETTINGS: Settings = {
   readingMode: "rsvp",
   reducedMotion: false,
   screenReaderOptimized: false,
+  readingAnchorEnabled: false,
 };

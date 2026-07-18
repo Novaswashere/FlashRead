@@ -5,18 +5,22 @@ export interface ReaderSectionProps {
   defaultWpm: number;
   orpEnabled: boolean;
   smartPauseEnabled: boolean;
+  readingAnchorEnabled: boolean;
   onWpmChange: (wpm: number) => void;
   onOrpChange: (enabled: boolean) => void;
   onSmartPauseChange: (enabled: boolean) => void;
+  onReadingAnchorChange: (enabled: boolean) => void;
 }
 
 export const ReaderSection: React.FC<ReaderSectionProps> = ({
   defaultWpm,
   orpEnabled,
   smartPauseEnabled,
+  readingAnchorEnabled,
   onWpmChange,
   onOrpChange,
   onSmartPauseChange,
+  onReadingAnchorChange,
 }) => {
   return (
     <div className="flex flex-col">
@@ -28,10 +32,10 @@ export const ReaderSection: React.FC<ReaderSectionProps> = ({
           </span>
           <div>
             <p className="font-medium text-on-surface">
-              Words Per Minute (WPM)
+              Reading Speed
             </p>
             <p className="text-xs text-on-surface-variant">
-              Adjust your target reading speed
+              How fast words appear (higher = faster reading)
             </p>
           </div>
         </div>
@@ -43,16 +47,16 @@ export const ReaderSection: React.FC<ReaderSectionProps> = ({
             onChange={(e) => onWpmChange(parseInt(e.target.value) || 350)}
           />
           <span className="text-xs font-label-mono text-on-surface-variant">
-            WPM
+            words/min
           </span>
         </div>
       </div>
 
       {/* ORP Toggle */}
       <Switch
-        icon="format_paint"
-        label="ORP Highlight"
-        description="Highlight the Optimal Recognition Point in blue"
+        icon="center_focus_strong"
+        label="Word Focus Mode"
+        description="Highlights the center of each word to help your eyes focus"
         checked={orpEnabled}
         onChange={(e) => onOrpChange(e.target.checked)}
       />
@@ -61,9 +65,18 @@ export const ReaderSection: React.FC<ReaderSectionProps> = ({
       <Switch
         icon="pause_circle"
         label="Smart Pause"
-        description="Pause automatically at punctuations and paragraph ends"
+        description="Pause briefly at commas, periods, and paragraph breaks"
         checked={smartPauseEnabled}
         onChange={(e) => onSmartPauseChange(e.target.checked)}
+      />
+
+      {/* Reading Anchor Toggle */}
+      <Switch
+        icon="bookmarks"
+        label="Reading Anchor"
+        description="Show paragraph context below the reader for better comprehension"
+        checked={readingAnchorEnabled}
+        onChange={(e) => onReadingAnchorChange(e.target.checked)}
       />
     </div>
   );

@@ -6,24 +6,21 @@ import { ReaderProvider, useReaderContext } from "@/providers/ReaderProvider";
 import { useSettingsContext } from "@/providers/SettingsProvider";
 import { useTheme } from "@/hooks/useTheme";
 import { useKeyboardShortcuts } from "@/features/reader/hooks/useKeyboardShortcuts";
-import { ReaderCanvas } from "@/features/reader/components/ReaderCanvas";
 import { ReaderWordDisplay } from "@/features/reader/components/ReaderWordDisplay";
 import { ReaderToolbar } from "@/features/reader/components/ReaderToolbar";
 import { ReaderControls } from "@/features/reader/components/ReaderControls";
-import { ReaderProgress } from "@/features/reader/components/ReaderProgress";
-import { ReaderStats } from "@/features/reader/components/ReaderStats";
-import { SpeedControl } from "@/features/reader/components/SpeedControl";
 import { AppearanceSettingsModal } from "@/features/reader/components/AppearanceSettingsModal";
 import { PlaybackSettingsModal } from "@/features/reader/components/PlaybackSettingsModal";
+import { ReadingAnchorPanel } from "@/features/reader/components/ReadingAnchorPanel";
+import { KeyboardShortcutsHelp } from "@/features/reader/components/KeyboardShortcutsHelp";
 import { storageService } from "@/services/storage";
 import { Book, ParsedBook, ReadingProgress as ProgressType } from "@/types";
 import { ReaderSkeleton } from "@/features/reader/components/ReaderSkeleton";
 import { useToast } from "@/providers/ToastProvider";
+import { readerConfig } from "@/config/reader";
+import { addWordsToday } from "@/lib/readingStats";
 import {
-  Loader2,
-  ArrowLeft,
   ArrowRight,
-  Play,
   Trophy,
   RefreshCw,
   Library,
@@ -65,7 +62,7 @@ interface ReaderInnerProps {
 function ReaderInner({
   book,
   parsedBook,
-  initialProgress,
+  initialProgress: _initialProgress,
   currentChapterIndex,
   onChapterChange,
   onWordIndexChange,
@@ -79,7 +76,7 @@ function ReaderInner({
   // Local presentation controls
   const [showAppearanceModal, setShowAppearanceModal] = useState(false);
   const [showPlaybackModal, setShowPlaybackModal] = useState(false);
-  const [showSpeedPicker, setShowSpeedPicker] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const activeTheme =
     theme === "system"
@@ -147,6 +144,22 @@ function ReaderInner({
     onWpmChange(snapshot.wpm);
   }, [snapshot.wpm, onWpmChange]);
 
+  // Feed the Home 7-day reading chart. Minimal and side-effect free on the
+  // engine/autosave: only logs positive deltas when the index advances within
+  // a chapter, and resets the baseline across chapter boundaries.
+  const lastWordRef = useRef(0);
+  const lastChapterRef = useRef(currentChapterIndex);
+  useEffect(() => {
+    if (lastChapterRef.current !== currentChapterIndex) {
+      lastWordRef.current = 0;
+      lastChapterRef.current = currentChapterIndex;
+    }
+    if (snapshot.currentIndex > lastWordRef.current) {
+      addWordsToday(snapshot.currentIndex - lastWordRef.current);
+    }
+    lastWordRef.current = snapshot.currentIndex;
+  }, [snapshot.currentIndex, currentChapterIndex]);
+
   const handleThemeChange = (newTheme: "light" | "dark") => {
     setTheme(newTheme);
     updateSettings({ theme: newTheme });
@@ -156,17 +169,27 @@ function ReaderInner({
     router.push("/");
   };
 
-  // Navigation functions defined using useCallback above
-
-  const handleProgressScrub = (index: number) => {
-    actions.seek(index);
+  // Transport + speed handlers (shared by mobile dock and desktop control card)
+  const handlePlayToggle = () =>
+    snapshot.state === "playing" ? actions.pause() : actions.play();
+  const handleCanvasClick = () => {
+    if (isEmptyChapter) return;
+    handlePlayToggle();
   };
+  const handleSkipBack = () =>
+    actions.seek(Math.max(0, snapshot.currentIndex - 10));
+  const handleSkipForward = () =>
+    actions.seek(Math.min(snapshot.totalWords - 1, snapshot.currentIndex + 10));
+  const incWpm = () =>
+    actions.setWpm(Math.min(readerConfig.maxWpm, snapshot.wpm + readerConfig.wpmStep));
+  const decWpm = () =>
+    actions.setWpm(Math.max(readerConfig.minWpm, snapshot.wpm - readerConfig.wpmStep));
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex flex-col items-center justify-center relative md:pl-64 pt-16">
-      {/* Play time logger */}
+    <div className="bg-background text-on-background min-h-screen">
       <PlayTimeTracker bookId={book.id} />
 
+      {/* Shared toolbar — fixed; offsets for the desktop drawer at md+ */}
       <ReaderToolbar
         title={book.title}
         chapterLabel={`Chapter ${currentChapterIndex + 1} of ${chaptersCount} • ${Math.round(snapshot.progressPercent)}%`}
@@ -175,258 +198,423 @@ function ReaderInner({
         onMoreActionsClick={() => setShowPlaybackModal(true)}
       />
 
-      {/* Chapter navigation hotkeys in header */}
-      <div className="absolute top-20 right-6 flex gap-2 z-40 items-center">
-        <button
-          onClick={handlePrevChapter}
-          disabled={currentChapterIndex === 0}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-surface-container dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 hover:border-border-subtle/80 dark:hover:border-zinc-700 disabled:opacity-30 transition text-on-surface-variant dark:text-zinc-400 active:scale-95 cursor-pointer text-xs font-semibold"
-          title="Previous Chapter"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Prev Chapter</span>
-        </button>
-        <button
-          onClick={handleNextChapter}
-          disabled={!hasNextChapter}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-surface-container dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 hover:border-border-subtle/80 dark:hover:border-zinc-700 disabled:opacity-30 transition text-on-surface-variant dark:text-zinc-400 active:scale-95 cursor-pointer text-xs font-semibold"
-          title="Next Chapter"
-        >
-          <span className="hidden sm:inline">Next Chapter</span>
-          <ArrowRight className="h-3.5 w-3.5" />
-        </button>
-      </div>
-
-      <main className="flex-grow flex items-center justify-center w-full px-space-md relative">
-        <ReaderCanvas
-          onCanvasClick={() => {
-            if (isEmptyChapter) return;
-            snapshot.state === "playing" ? actions.pause() : actions.play();
-          }}
-          orpEnabled={settings.orpEnabled && !isEmptyChapter}
-        >
-          {isEmptyChapter ? (
-            <div className="max-w-[400px] w-full bg-white/75 dark:bg-zinc-900/75 border border-zinc-200 dark:border-zinc-800/80 backdrop-blur-md rounded-2xl p-6 text-center shadow-xl animate-in fade-in duration-200 flex flex-col items-center justify-center gap-4 text-on-surface">
-              <div className="h-12 w-12 bg-primary/10 dark:bg-cyan-950 border border-primary/20 dark:border-cyan-800 rounded-full flex items-center justify-center text-primary dark:text-cyan-400">
-                <span className="material-symbols-outlined text-2xl">image</span>
-              </div>
-              <h3 className="text-base font-bold">Visual Page / Illustration</h3>
-              <p className="text-on-surface-variant text-xs leading-relaxed">
-                This chapter contains no readable text content (likely a cover page or drawing illustration) and cannot be read using rapid serial visual presentation (RSVP) mode.
-              </p>
-              <div className="flex gap-3 w-full mt-2">
-                {currentChapterIndex > 0 && (
-                  <button
-                    onClick={handlePrevChapter}
-                    className="flex-1 px-3 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold border border-border-subtle transition cursor-pointer flex items-center justify-center gap-1"
-                  >
-                    <ArrowLeft className="h-3 w-3" /> Prev Chapter
-                  </button>
-                )}
-                {hasNextChapter ? (
-                  <button
-                    onClick={handleNextChapter}
-                    className="flex-1 px-3 py-2 rounded-lg bg-primary text-on-primary hover:brightness-110 text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1"
-                  >
-                    Next Chapter <ArrowRight className="h-3 w-3" />
-                  </button>
+      {/* ============================ MOBILE (< md) ============================ */}
+      <div className="md:hidden">
+        <main className="flex flex-col min-h-screen pt-16 pb-56">
+          {/* RSVP engine card */}
+          <div className="px-md pt-md mb-sm">
+            <div
+              onClick={handleCanvasClick}
+              className="relative mx-auto max-w-reader-width h-64 bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer"
+            >
+              {/* Vertical ORP guide line */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-primary/5" />
+              <div className="relative z-10 px-md text-center">
+                {isEmptyChapter ? (
+                  <div className="max-w-[300px] mx-auto flex flex-col items-center gap-sm text-on-surface-variant">
+                    <span className="material-symbols-outlined text-3xl text-primary">image</span>
+                    <p className="font-body-md text-sm">
+                      This chapter has images or illustrations. Skip to the next chapter to continue reading.
+                    </p>
+                    {hasNextChapter ? (
+                      <button
+                        onClick={handleNextChapter}
+                        className="mt-xs inline-flex items-center gap-1 px-md py-xs rounded-lg bg-primary text-on-primary text-xs font-semibold active:scale-95 transition"
+                      >
+                        Next Chapter <ArrowRight className="h-3 w-3" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleBack}
+                        className="mt-xs inline-flex items-center gap-1 px-md py-xs rounded-lg bg-primary text-on-primary text-xs font-semibold active:scale-95 transition"
+                      >
+                        <Library className="h-3 w-3" /> Library
+                      </button>
+                    )}
+                  </div>
                 ) : (
-                  <button
-                    onClick={handleBack}
-                    className="flex-1 px-3 py-2 rounded-lg bg-primary text-on-primary hover:brightness-110 text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1"
-                  >
-                    <Library className="h-3 w-3" /> Library
-                  </button>
+                  <div className={snapshot.state === "playing" ? "" : "pulse-active"}>
+                    <ReaderWordDisplay
+                      word={snapshot.currentWord}
+                      orpIndex={snapshot.orpIndex}
+                      font={settings.font}
+                      fontSize={settings.fontSize}
+                      orpEnabled={settings.orpEnabled}
+                    />
+                  </div>
                 )}
               </div>
             </div>
-          ) : (
-            <>
-              <ReaderWordDisplay
-                word={snapshot.currentWord}
-                orpIndex={snapshot.orpIndex}
+          </div>
+
+          {/* Current Context panel */}
+          {!isEmptyChapter && settings.readingAnchorEnabled && (
+            <div className="px-md flex-1 min-h-0">
+              <ReadingAnchorPanel
+                chapter={currentChapter}
                 font={settings.font}
                 fontSize={settings.fontSize}
-                orpEnabled={settings.orpEnabled}
               />
-              {snapshot.state === "playing" && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-32 h-1 bg-primary/20 blur-xl"></div>
-              )}
-            </>
+            </div>
           )}
-        </ReaderCanvas>
+        </main>
 
-        {/* OVERLAY: Chapter / Book Completion */}
-        {isChapterFinished && (
-          <div className="absolute inset-0 bg-white/95 dark:bg-zinc-950/90 backdrop-blur-md flex items-center justify-center z-50 p-6">
-            <div className="max-w-[450px] w-full bg-surface-container-lowest dark:bg-zinc-900 border border-border-subtle dark:border-zinc-800 rounded-2xl p-8 text-center shadow-2xl animate-in fade-in zoom-in duration-300">
-              {hasNextChapter ? (
-                <>
-                  <div className="h-14 w-14 bg-primary/10 dark:bg-cyan-950 border border-primary/20 dark:border-cyan-800 rounded-full flex items-center justify-center mx-auto mb-6 text-primary dark:text-cyan-400 animate-bounce">
-                    <Trophy className="h-6 w-6" />
+        {/* Bottom dock: speed pill + transport bar (raised to clear global BottomNavBar) */}
+        {!isEmptyChapter && (
+          <div className="fixed bottom-24 inset-x-0 z-40 px-md md:hidden">
+            <div className="mx-auto max-w-reader-width flex flex-col items-center gap-sm">
+              {/* Speed pill */}
+              <div className="glass-dock rounded-full flex items-center justify-between gap-md px-md py-xs w-[240px]">
+                <button
+                  onClick={decWpm}
+                  aria-label="Decrease speed"
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high active:scale-90 transition cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-on-surface-variant text-[18px]">remove</span>
+                </button>
+                <div className="flex flex-col items-center leading-none">
+                  <span className="font-label-sm text-label-sm text-outline uppercase tracking-widest">Reading Speed</span>
+                  <span className="font-bold text-primary text-sm">{snapshot.wpm} WPM</span>
+                </div>
+                <button
+                  onClick={incWpm}
+                  aria-label="Increase speed"
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high active:scale-90 transition cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-on-surface-variant text-[18px]">add</span>
+                </button>
+              </div>
+
+              {/* Transport bar */}
+              <div className="glass-dock rounded-full shadow-2xl flex items-center justify-between gap-md px-md py-sm">
+                <button
+                  onClick={handlePrevChapter}
+                  disabled={currentChapterIndex === 0}
+                  aria-label="Previous chapter"
+                  className="material-symbols-outlined text-on-surface-variant hover:text-primary disabled:opacity-30 p-xs active:scale-90 transition cursor-pointer"
+                >
+                  keyboard_double_arrow_left
+                </button>
+                <div className="h-5 w-px bg-outline-variant/30" />
+                <ReaderControls
+                  isPlaying={snapshot.state === "playing"}
+                  onPlayToggle={handlePlayToggle}
+                  onSkipBack={handleSkipBack}
+                  onSkipForward={handleSkipForward}
+                />
+                <div className="h-5 w-px bg-outline-variant/30" />
+                <button
+                  onClick={handleNextChapter}
+                  disabled={!hasNextChapter}
+                  aria-label="Next chapter"
+                  className="material-symbols-outlined text-on-surface-variant hover:text-primary disabled:opacity-30 p-xs active:scale-90 transition cursor-pointer"
+                >
+                  keyboard_double_arrow_right
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ============================ DESKTOP (>= md) ============================ */}
+      <div className="hidden md:block md:pl-64">
+        <div className="flex min-h-screen">
+          {/* Center reading column */}
+          <main className="flex-1 relative flex flex-col pt-20 pb-md px-lg min-h-screen">
+            {/* Timer info row */}
+            <div className="flex items-center justify-center gap-md font-label-sm text-label-sm text-on-surface-variant tracking-wider">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-primary" />
+                {snapshot.elapsedTimeLabel}
+              </span>
+              <span className="opacity-30">|</span>
+              <span>{Math.round(snapshot.progressPercent)}% COMPLETE</span>
+              <span className="opacity-30">|</span>
+              <span>{snapshot.remainingTimeLabel} REMAINING</span>
+            </div>
+
+            {/* RSVP word + full-height guide line */}
+            <div
+              onClick={handleCanvasClick}
+              className="flex-1 flex items-center justify-center relative my-lg cursor-pointer"
+            >
+              <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-primary/5" />
+              <div className={snapshot.state === "playing" ? "" : "pulse-active"}>
+                {isEmptyChapter ? (
+                  <div className="text-center text-on-surface-variant font-body-md">
+                    <span className="material-symbols-outlined text-5xl text-primary block mb-sm">image</span>
+                    This chapter contains images or illustrations.
                   </div>
-                  <h3 className="text-xl font-bold text-on-surface mb-2">
-                    Chapter Completed!
-                  </h3>
-                  <p className="text-on-surface-variant text-sm mb-6">
-                    You read {snapshot.totalWords} words at {snapshot.wpm} WPM.
-                    Excellent speed reading.
-                  </p>
+                ) : (
+                  <ReaderWordDisplay
+                    word={snapshot.currentWord}
+                    orpIndex={snapshot.orpIndex}
+                    font={settings.font}
+                    fontSize={Math.round(settings.fontSize * 1.4)}
+                    orpEnabled={settings.orpEnabled}
+                  />
+                )}
+              </div>
+            </div>
 
-                  <div className="bg-surface-container dark:bg-zinc-950 border border-border-subtle dark:border-zinc-850 rounded-xl p-5 mb-6 text-left">
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-primary dark:text-cyan-500 block mb-1">
-                      Up Next
-                    </span>
-                    <div className="font-medium text-on-surface line-clamp-1">
-                      {parsedBook.chapters[currentChapterIndex + 1]?.title ||
-                        `Chapter ${currentChapterIndex + 2}`}
-                    </div>
-                  </div>
+            {/* Current Context panel */}
+            {!isEmptyChapter && settings.readingAnchorEnabled && (
+              <div className="w-full max-w-2xl mx-auto mb-md">
+                <ReadingAnchorPanel
+                  chapter={currentChapter}
+                  font={settings.font}
+                  fontSize={settings.fontSize}
+                />
+              </div>
+            )}
 
-                  {!isAutoplayPaused ? (
-                    <div className="text-xs text-on-surface-variant mb-6 flex items-center justify-center gap-1.5">
-                      <span className="inline-block h-2 w-2 rounded-full bg-primary dark:bg-cyan-500 animate-ping" />
-                      Auto-advancing in{" "}
-                      <span className="font-bold text-on-surface">
-                        {autoplaySeconds}s
+            {/* Main control card */}
+            {!isEmptyChapter && (
+              <div className="w-full max-w-xl mx-auto">
+                <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shadow-sm px-lg py-md flex items-center justify-between">
+                  {/* Left: speed */}
+                  <div className="flex items-center gap-sm w-32">
+                    <span className="material-symbols-outlined text-primary text-[20px]">speed</span>
+                    <div className="flex flex-col leading-none">
+                      <span className="font-label-sm text-label-sm text-outline uppercase tracking-widest">Speed</span>
+                      <span className="font-bold text-on-surface text-sm">
+                        {snapshot.wpm} <span className="font-normal text-on-surface-variant">wpm</span>
                       </span>
-                      ...
                     </div>
-                  ) : (
-                    <div className="text-xs text-on-surface-variant mb-6">
-                      Autoplay paused
-                    </div>
-                  )}
+                  </div>
 
-                  <div className="flex gap-4">
+                  {/* Center: transport */}
+                  <div className="flex items-center gap-sm">
                     <button
-                      onClick={() => setIsAutoplayPaused((p) => !p)}
-                      className="flex-1 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high dark:bg-zinc-800 dark:hover:bg-zinc-700 text-on-surface dark:text-zinc-300 text-sm font-medium border border-border-subtle dark:border-zinc-700 transition"
+                      onClick={handlePrevChapter}
+                      disabled={currentChapterIndex === 0}
+                      aria-label="Previous chapter"
+                      className="material-symbols-outlined text-on-surface-variant hover:text-primary disabled:opacity-30 p-xs active:scale-90 transition cursor-pointer"
                     >
-                      {isAutoplayPaused ? "Resume Autoplay" : "Pause"}
+                      keyboard_double_arrow_left
                     </button>
+                    <ReaderControls
+                      isPlaying={snapshot.state === "playing"}
+                      onPlayToggle={handlePlayToggle}
+                      onSkipBack={handleSkipBack}
+                      onSkipForward={handleSkipForward}
+                    />
                     <button
                       onClick={handleNextChapter}
-                      className="flex-1 px-4 py-2.5 rounded-lg bg-primary hover:brightness-110 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-on-primary dark:text-zinc-950 font-bold text-sm transition shadow-lg shadow-primary-container/20 dark:shadow-cyan-950/20"
+                      disabled={!hasNextChapter}
+                      aria-label="Next chapter"
+                      className="material-symbols-outlined text-on-surface-variant hover:text-primary disabled:opacity-30 p-xs active:scale-90 transition cursor-pointer"
                     >
-                      Read Next Chapter
+                      keyboard_double_arrow_right
                     </button>
                   </div>
-                </>
-              ) : (
-                <>
-                  <div className="h-16 w-16 bg-gradient-to-tr from-yellow-500 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-950 animate-pulse shadow-lg shadow-yellow-500/20 dark:shadow-yellow-950/20">
-                    <Trophy className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-on-surface mb-2">
-                    Book Finished!
-                  </h3>
-                  <p className="text-on-surface-variant text-sm mb-8 leading-relaxed">
-                    Congratulations! You have successfully completed reading{" "}
-                    <span className="text-on-surface font-semibold">
-                      &ldquo;{book.title}&rdquo;
+
+                  {/* Right: progress */}
+                  <div className="flex flex-col items-end w-32">
+                    <span className="font-label-sm text-label-sm text-outline uppercase tracking-widest">Progress</span>
+                    <span className="font-bold text-on-surface text-sm">
+                      {snapshot.wordsRead} <span className="font-normal text-on-surface-variant">words</span>
                     </span>
-                    .
-                  </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
 
-                  <div className="flex flex-col gap-3">
+          {/* Right settings panel (lg+) */}
+          <aside className="hidden lg:flex w-64 shrink-0 border-l border-outline-variant/30 flex-col gap-lg p-lg overflow-y-auto">
+            {/* Reading Speed */}
+            <section className="flex flex-col gap-sm">
+              <span className="font-label-sm text-label-sm text-outline uppercase tracking-widest">Reading Speed</span>
+              <div className="bg-surface-container border border-outline-variant/30 rounded-xl p-md">
+                <div className="flex items-center justify-between mb-sm">
+                  <span className="font-headline-lg text-on-surface">{snapshot.wpm}</span>
+                  <div className="flex gap-xs">
                     <button
-                      onClick={() => {
-                        actions.seek(0);
-                        if (currentChapterIndex > 0) {
-                          onChapterChange(0);
-                        }
-                      }}
-                      className="w-full px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high dark:bg-zinc-800 dark:hover:bg-zinc-700 text-on-surface dark:text-zinc-200 text-sm font-medium border border-border-subtle dark:border-zinc-700 transition flex items-center justify-center gap-2"
+                      onClick={decWpm}
+                      aria-label="Decrease speed"
+                      className="w-8 h-8 flex items-center justify-center border border-outline-variant/30 rounded-lg hover:bg-surface-container-high active:scale-90 transition cursor-pointer"
                     >
-                      <RefreshCw className="h-4 w-4" /> Restart Book
+                      <span className="material-symbols-outlined text-[18px]">remove</span>
                     </button>
                     <button
-                      onClick={handleBack}
-                      className="w-full px-4 py-2.5 rounded-lg bg-primary hover:brightness-110 dark:bg-gradient-to-r dark:from-cyan-500 dark:to-emerald-500 dark:hover:from-cyan-400 dark:hover:to-emerald-400 text-on-primary dark:text-zinc-950 font-bold text-sm transition flex items-center justify-center gap-2"
+                      onClick={incWpm}
+                      aria-label="Increase speed"
+                      className="w-8 h-8 flex items-center justify-center border border-outline-variant/30 rounded-lg hover:bg-surface-container-high active:scale-90 transition cursor-pointer"
                     >
-                      <Library className="h-4 w-4" /> Back to Library
+                      <span className="material-symbols-outlined text-[18px]">add</span>
                     </button>
                   </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* Floating control dock */}
-      <footer className="relative w-full max-w-[600px] px-space-md z-45 mb-space-xl">
-        <div className="bg-white/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800/80 backdrop-blur-md rounded-xl p-space-md shadow-sm flex flex-col gap-space-md">
-          <ReaderProgress
-            currentIndex={snapshot.currentIndex}
-            totalWords={snapshot.totalWords}
-            elapsedTimeLabel={snapshot.elapsedTimeLabel}
-            remainingTimeLabel={`${snapshot.remainingTimeLabel} remaining`}
-            onProgressScrub={handleProgressScrub}
-          />
-          <div className="relative flex items-center justify-between w-full min-h-[56px]">
-            <div className="flex justify-start">
-              <button
-                onClick={() => setShowSpeedPicker((prev) => !prev)}
-                className="flex flex-col items-start hover:bg-surface-container-low px-3 py-1 rounded-lg transition-colors cursor-pointer text-left"
-              >
-                <span className="font-label-mono text-[10px] text-on-surface-variant uppercase">
-                  Speed
-                </span>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-label-mono text-lg text-primary font-bold">
-                    {snapshot.wpm}
-                  </span>
-                  <span className="font-label-mono text-[10px] text-on-surface-variant">
-                    WPM
-                  </span>
                 </div>
+                <input
+                  type="range"
+                  min={readerConfig.minWpm}
+                  max={readerConfig.maxWpm}
+                  step={readerConfig.wpmStep}
+                  value={snapshot.wpm}
+                  onChange={(e) => actions.setWpm(Number(e.target.value))}
+                  className="w-full accent-primary cursor-pointer"
+                />
+              </div>
+            </section>
+
+            {/* Visual Mode */}
+            <section className="flex flex-col gap-sm">
+              <span className="font-label-sm text-label-sm text-outline uppercase tracking-widest">Visual Mode</span>
+              <div className="grid grid-cols-2 gap-xs p-xs bg-surface-container border border-outline-variant/30 rounded-xl">
+                <button
+                  onClick={() => updateSettings({ orpEnabled: true })}
+                  className={`py-xs font-label-sm text-label-sm rounded-lg transition cursor-pointer ${settings.orpEnabled ? "bg-surface-container-lowest text-primary border border-primary/20 shadow-sm" : "text-on-surface-variant"}`}
+                >
+                  Focus
+                </button>
+                <button
+                  onClick={() => updateSettings({ orpEnabled: false })}
+                  className={`py-xs font-label-sm text-label-sm rounded-lg transition cursor-pointer ${!settings.orpEnabled ? "bg-surface-container-lowest text-primary border border-primary/20 shadow-sm" : "text-on-surface-variant"}`}
+                >
+                  Serene
+                </button>
+              </div>
+            </section>
+
+            {/* Text Scale */}
+            <section className="flex flex-col gap-sm">
+              <span className="font-label-sm text-label-sm text-outline uppercase tracking-widest">Text Scale</span>
+              <div className="flex items-center gap-md">
+                <span className="text-xs text-on-surface-variant">A</span>
+                <input
+                  type="range"
+                  min={32}
+                  max={96}
+                  step={4}
+                  value={settings.fontSize}
+                  onChange={(e) => updateSettings({ fontSize: Number(e.target.value) })}
+                  className="flex-1 accent-primary cursor-pointer"
+                />
+                <span className="text-xl text-on-surface-variant font-bold">A</span>
+              </div>
+            </section>
+
+            {/* ORP Position */}
+            <section className="flex flex-col gap-sm">
+              <span className="font-label-sm text-label-sm text-outline uppercase tracking-widest">Optimal Recognition</span>
+              <div className="p-sm bg-surface-container rounded-xl text-center">
+                <span className="font-body-md text-xs text-on-surface-variant italic">Auto-optimized for focus</span>
+              </div>
+            </section>
+
+            {/* Keyboard Shortcuts */}
+            <div className="mt-auto pt-md border-t border-outline-variant/20">
+              <button
+                onClick={() => setShowShortcuts(true)}
+                className="flex items-center gap-xs text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[16px]">keyboard</span>
+                <span className="font-label-sm text-label-sm">Keyboard Shortcuts</span>
               </button>
             </div>
+          </aside>
+        </div>
+      </div>
 
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-              <ReaderControls
-                isPlaying={snapshot.state === "playing"}
-                onPlayToggle={() =>
-                  snapshot.state === "playing"
-                    ? actions.pause()
-                    : actions.play()
-                }
-                onSkipBack={() =>
-                  actions.seek(Math.max(0, snapshot.currentIndex - 10))
-                }
-                onSkipForward={() =>
-                  actions.seek(
-                    Math.min(
-                      snapshot.totalWords - 1,
-                      snapshot.currentIndex + 10
-                    )
-                  )
-                }
-              />
-            </div>
+      {/* ============================ Shared overlays ============================ */}
+      {isChapterFinished && (
+        <div className="fixed inset-0 md:left-64 bg-surface-container-lowest/95 backdrop-blur-md flex items-center justify-center z-50 p-md">
+          <div className="max-w-[450px] w-full bg-surface-container-lowest border border-outline-variant rounded-xl p-xl text-center shadow-2xl animate-fade-in-up">
+            {hasNextChapter ? (
+              <>
+                <div className="h-14 w-14 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center mx-auto mb-lg text-primary animate-bounce">
+                  <Trophy className="h-6 w-6" />
+                </div>
+                <h3 className="font-headline-lg text-xl font-bold text-on-surface mb-2">
+                  Chapter Complete!
+                </h3>
+                <p className="text-on-surface-variant text-sm mb-lg font-body-md">
+                  You read {snapshot.totalWords} words at {snapshot.wpm} words per minute.
+                  Great progress!
+                </p>
 
-            <div className="flex justify-end items-center gap-space-sm sm:gap-space-md">
-              <ReaderStats
-                wordsRead={snapshot.wordsRead}
-                totalWords={snapshot.totalWords}
-                currentWPM={snapshot.wpm}
-              />
-            </div>
+                <div className="bg-surface-container border border-outline-variant/30 rounded-xl p-lg mb-lg text-left">
+                  <span className="font-label-sm text-label-sm uppercase tracking-wider text-primary block mb-1">
+                    Up Next
+                  </span>
+                  <div className="font-medium text-on-surface line-clamp-1">
+                    {parsedBook.chapters[currentChapterIndex + 1]?.title ||
+                      `Chapter ${currentChapterIndex + 2}`}
+                  </div>
+                </div>
+
+                {!isAutoplayPaused ? (
+                  <div className="text-xs text-on-surface-variant mb-lg flex items-center justify-center gap-1.5">
+                    <span className="inline-block h-2 w-2 rounded-full bg-primary animate-ping" />
+                    Auto-advancing in{" "}
+                    <span className="font-bold text-on-surface">
+                      {autoplaySeconds}s
+                    </span>
+                    ...
+                  </div>
+                ) : (
+                  <div className="text-xs text-on-surface-variant mb-lg">
+                    Autoplay paused
+                  </div>
+                )}
+
+                <div className="flex gap-md">
+                  <button
+                    onClick={() => setIsAutoplayPaused((p) => !p)}
+                    className="flex-1 px-md py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-outline-variant/30 transition active:scale-95"
+                  >
+                    {isAutoplayPaused ? "Resume Autoplay" : "Pause"}
+                  </button>
+                  <button
+                    onClick={handleNextChapter}
+                    className="flex-1 px-md py-2.5 rounded-lg bg-primary hover:brightness-110 text-on-primary font-bold text-sm transition active:scale-95"
+                  >
+                    Read Next Chapter
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="h-16 w-16 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center mx-auto mb-lg text-primary animate-pulse">
+                  <Trophy className="h-8 w-8" />
+                </div>
+                <h3 className="font-headline-lg text-2xl font-bold text-on-surface mb-2">
+                  Book Finished!
+                </h3>
+                <p className="text-on-surface-variant text-sm mb-xl leading-relaxed font-body-md">
+                  Congratulations! You have successfully completed reading{" "}
+                  <span className="text-on-surface font-semibold">
+                    &ldquo;{book.title}&rdquo;
+                  </span>
+                  .
+                </p>
+
+                <div className="flex flex-col gap-sm">
+                  <button
+                    onClick={() => {
+                      actions.seek(0);
+                      if (currentChapterIndex > 0) {
+                        onChapterChange(0);
+                      }
+                    }}
+                    className="w-full px-md py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-outline-variant/30 transition flex items-center justify-center gap-sm active:scale-95"
+                  >
+                    <RefreshCw className="h-4 w-4" /> Restart Book
+                  </button>
+                  <button
+                    onClick={handleBack}
+                    className="w-full px-md py-2.5 rounded-lg bg-primary hover:brightness-110 text-on-primary font-bold text-sm transition flex items-center justify-center gap-sm active:scale-95"
+                  >
+                    <Library className="h-4 w-4" /> Back to Library
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-
-        {showSpeedPicker && (
-          <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 z-55">
-            <SpeedControl
-              currentWpm={snapshot.wpm}
-              onWpmChange={(wpm) => actions.setWpm(wpm)}
-              onClose={() => setShowSpeedPicker(false)}
-            />
-          </div>
-        )}
-      </footer>
+      )}
 
       {showAppearanceModal && (
         <AppearanceSettingsModal
@@ -437,8 +625,14 @@ function ReaderInner({
       )}
 
       {showPlaybackModal && (
-        <PlaybackSettingsModal
-          onClose={() => setShowPlaybackModal(false)}
+        <PlaybackSettingsModal onClose={() => setShowPlaybackModal(false)} />
+      )}
+
+      {showShortcuts && (
+        <KeyboardShortcutsHelp
+          onClose={() => setShowShortcuts(false)}
+          currentTheme={activeTheme}
+          onThemeSelect={handleThemeChange}
         />
       )}
     </div>
@@ -511,7 +705,7 @@ function ReaderLoader() {
           setCurrentChapterIndex(fetchedProgress.currentChapterIndex || 0);
           setCurrentWordIndex(fetchedProgress.currentWordIndex || 0);
           setCurrentWpm(fetchedProgress.wpm || 350);
-          
+
           if (fetchedProgress.currentChapterIndex > 0 || fetchedProgress.currentWordIndex > 0) {
             showGlobalToast(`Reading progress restored. Resumed at Chapter ${fetchedProgress.currentChapterIndex + 1}`, "success");
           }
@@ -589,23 +783,23 @@ function ReaderLoader() {
 
   if (error || !book || !parsedBook || !progress) {
     return (
-      <div className="bg-background min-h-screen text-on-background flex flex-col items-center justify-center p-6 text-center">
-        <div className="max-w-[400px] bg-surface-container border border-border-subtle rounded-xl p-6 shadow-xl text-center">
+      <div className="bg-background min-h-screen text-on-background flex flex-col items-center justify-center p-xl text-center">
+        <div className="max-w-[400px] bg-surface-container-lowest border border-outline-variant rounded-xl p-xl text-center">
           <span
-            className="material-symbols-outlined text-5xl text-primary mb-4"
+            className="material-symbols-outlined text-5xl text-primary mb-lg"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
             auto_stories
           </span>
-          <h3 className="text-lg font-bold text-on-surface mb-2">
+          <h3 className="font-headline-lg text-lg font-bold text-on-surface mb-2">
             No Book Selected
           </h3>
-          <p className="text-on-surface-variant text-sm mb-6">
+          <p className="text-on-surface-variant text-sm mb-lg font-body-md">
             Select a Book from the Library to start reading.
           </p>
           <button
             onClick={() => router.push("/")}
-            className="w-full px-4 py-2.5 bg-primary text-on-primary hover:brightness-110 text-sm font-semibold rounded-lg transition-all"
+            className="w-full px-md py-2.5 bg-primary text-on-primary hover:brightness-110 text-sm font-semibold rounded-lg transition-all active:scale-95"
           >
             Go to Library
           </button>

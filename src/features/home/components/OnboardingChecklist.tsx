@@ -22,70 +22,70 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ steps 
   const progressPercentage = steps.length > 0 ? Math.round((completedCount / steps.length) * 100) : 0;
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-surface-container-low border border-border-subtle rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-xl transition-all hover:border-primary/50 relative overflow-hidden group">
-      {/* Decorative gradient glowing bubble */}
-      <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/20 transition-all duration-500" />
-      <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-500" />
+    <div className="w-full max-w-2xl mx-auto glass-card rounded-xl p-lg md:p-xl relative overflow-hidden group">
+      {/* Decorative accent glow */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/20 transition-all duration-500" />
+      <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/20 transition-all duration-500" />
 
       <div className="relative z-10">
-        <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2">
+        <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-sm">
           Getting Started
         </h2>
-        <p className="text-on-surface-variant text-sm md:text-base mb-6">
-          Welcome to FlashRead! Follow this quick setup checklist to import your first book and experience speed-reading.
+        <p className="font-body-md text-on-surface-variant mb-lg">
+          Welcome to FlashRead! Follow these simple steps to start reading faster and more focused than ever before.
         </p>
 
         {/* Progress bar */}
-        <div className="mb-8">
+        <div className="mb-lg">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs md:text-sm font-medium text-on-surface-variant">
+            <span className="font-label-sm text-label-sm text-on-surface-variant">
               Checklist Progress
             </span>
-            <span className="text-xs md:text-sm font-semibold text-primary">
+            <span className="font-label-sm text-label-sm font-bold text-primary">
               {completedCount} of {steps.length} completed ({progressPercentage}%)
             </span>
           </div>
-          <div className="w-full h-2.5 bg-surface-container-highest rounded-full overflow-hidden">
+          <div className="w-full h-1 bg-surface-dim rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-500 ease-out"
+              className="h-full bg-primary transition-all duration-500 ease-out"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
         </div>
 
         {/* Checklist Steps */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-md">
           {steps.map((step) => (
             <div
               key={step.id}
               onClick={() => !step.isCompleted && router.push(step.actionPath)}
-              className={`flex items-start gap-4 p-4 rounded-xl border transition-all ${
+              className={`flex items-start gap-md p-md rounded-xl border transition-all ${
                 step.isCompleted
-                  ? "bg-surface-container border-emerald-500/20 opacity-80"
-                  : "bg-surface-container-highest/30 border-border-subtle hover:border-primary/50 cursor-pointer hover:bg-surface-container-highest/60"
+                  ? "bg-surface-container border-primary/20 opacity-80"
+                  : "bg-surface-container-lowest/40 border-outline-variant/30 hover:border-primary/50 cursor-pointer hover:bg-surface-container-lowest/70"
               }`}
             >
               <div className="mt-1 shrink-0">
                 {step.isCompleted ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
                 ) : (
                   <Circle className="h-5 w-5 text-outline group-hover:text-primary transition-colors" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <h3
-                  className={`font-semibold text-sm md:text-base text-on-surface ${
+                  className={`font-label-md text-label-md font-bold text-on-surface ${
                     step.isCompleted ? "line-through text-on-surface-variant" : ""
                   }`}
                 >
                   {step.title}
                 </h3>
-                <p className="text-xs md:text-sm text-on-surface-variant mt-1 leading-relaxed">
+                <p className="font-body-md text-on-surface-variant mt-1 leading-relaxed">
                   {step.description}
                 </p>
               </div>
               {!step.isCompleted && (
-                <button className="shrink-0 flex items-center gap-1 text-xs md:text-sm font-semibold text-primary hover:text-primary-hover active:scale-95 transition-all self-center">
+                <button className="shrink-0 flex items-center gap-1 font-label-md text-label-md font-bold text-primary hover:opacity-80 active:scale-95 transition-all self-center">
                   <span>{step.actionLabel}</span>
                   <ArrowRight className="h-3 w-3" />
                 </button>

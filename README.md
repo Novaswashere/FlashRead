@@ -1,6 +1,6 @@
-# FlashRead ⚡
+# ReadPilot ⚡
 
-FlashRead is a modern, high-performance Rapid Serial Visual Presentation (RSVP) speed-reading web application. Designed for visual comfort and high-speed comprehension, it parses documents locally and streams words sequentially, highlighting the Optimal Recognition Point (ORP) to accelerate reading speed and minimize vocalization.
+ReadPilot is a modern, high-performance Rapid Serial Visual Presentation (RSVP) speed-reading web application. Designed for visual comfort and high-speed comprehension, it parses documents locally and streams words sequentially, highlighting the Optimal Recognition Point (ORP) to accelerate reading speed and minimize vocalization.
 
 ---
 
@@ -37,8 +37,8 @@ Make sure you have [Node.js](https://nodejs.org) (v18.x or higher) and `npm` ins
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/your-username/flashread.git
-   cd flashread
+   git clone https://github.com/your-username/readpilot.git
+   cd readpilot
    ```
 
 2. **Install Dependencies**

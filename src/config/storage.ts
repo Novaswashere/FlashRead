@@ -1,5 +1,5 @@
 export const storageConfig = {
-  dbName: "flashread-local-db",
+  dbName: "readpilot-local-db",
   dbVersion: 1,
   stores: {
     books: "books",

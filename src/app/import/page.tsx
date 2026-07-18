@@ -57,6 +57,9 @@ export default function ImportPage() {
     "info"
   );
 
+  // Recent Queue (read-only decorative list)
+  const [recentBooks, setRecentBooks] = useState<Book[]>([]);
+
   // Cleanup Object URLs on unmount
   useEffect(() => {
     return () => {
@@ -65,6 +68,29 @@ export default function ImportPage() {
       }
     };
   }, [coverPreviewUrl]);
+
+  // Load recent imports for the decorative Recent Queue (read-only, best-effort)
+  useEffect(() => {
+    let mounted = true;
+    storageService.books
+      .getAll()
+      .then((books) => {
+        if (!mounted) return;
+        const sorted = [...books]
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+          .slice(0, 3);
+        setRecentBooks(sorted);
+      })
+      .catch(() => {
+        // Recent queue is decorative; ignore failures silently.
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleStartParsing = async (
     data: File | string,
@@ -125,7 +151,7 @@ export default function ImportPage() {
       const msg = err.message || "";
       setErrorType(code);
       setErrorMessage(msg);
-      
+
       const mapped = mapError(code, msg);
       setMappedError(mapped);
       setState("ERROR");
@@ -253,18 +279,17 @@ export default function ImportPage() {
   };
 
   return (
-    <main className="pt-24 pb-20 md:pb-8 md:pl-72 px-space-md max-w-container-max mx-auto min-h-screen text-left bg-background text-on-background">
+    <main className="pt-24 pb-20 md:pb-8 md:pl-72 px-margin-mobile md:px-xl max-w-container-max mx-auto min-h-screen text-left bg-background text-on-background">
       <div className="max-w-[800px] mx-auto">
         {/* IDLE STATE */}
         {state === "IDLE" && (
           <>
-            <div className="mb-space-xl">
-              <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2">
-                Import New Content
-              </h2>
-              <p className="text-on-surface-variant font-body-md">
-                Add documents or raw text to your library to start speed
-                reading.
+            <div className="mb-xl max-w-2xl animate-fade-in-up">
+              <h1 className="font-headline-xl text-headline-xl text-on-background tracking-tight mb-sm">
+                Add Your Books
+              </h1>
+              <p className="font-body-lg text-body-lg text-on-surface-variant">
+                Import your reading material to start speed reading. We support EPUB, PDF, TXT files, and direct text paste.
               </p>
             </div>
 
@@ -279,103 +304,153 @@ export default function ImportPage() {
             <UploadDropzone onFileDrop={handleFileDrop} isProcessing={false} />
             <PasteTextCard onPasteText={handlePasteText} />
             <ImportHelpSection />
+
+            {/* Recent Queue — read-only decorative list of recent imports */}
+            {recentBooks.length > 0 && (
+              <section className="mt-xl animate-fade-in-up stagger-4">
+                <div className="flex items-center justify-between mb-md border-b border-outline-variant/10 pb-sm">
+                  <h2 className="font-headline-md text-headline-md text-on-background">
+                    Recently Imported
+                  </h2>
+                </div>
+                <div className="space-y-sm">
+                  {recentBooks.map((book) => (
+                    <div
+                      key={book.id}
+                      className="flex items-center justify-between p-md bg-surface-container-low/50 rounded-lg border border-outline-variant/10"
+                    >
+                      <div className="flex items-center gap-md min-w-0">
+                        <div className="w-10 h-10 bg-surface-container-high rounded flex items-center justify-center shrink-0">
+                          <span className="material-symbols-outlined text-on-surface-variant">
+                            menu_book
+                          </span>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-label-md text-label-md text-on-background truncate">
+                            {book.title}
+                          </p>
+                          <p className="font-label-sm text-label-sm text-on-surface-variant">
+                            {book.format.toUpperCase()} •{" "}
+                            {new Date(book.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        className="p-xs hover:bg-surface-container-high rounded transition-colors shrink-0"
+                        aria-label="More options"
+                      >
+                        <span className="material-symbols-outlined text-on-surface-variant">
+                          more_vert
+                        </span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </>
         )}
 
         {/* PARSING STATE */}
         {state === "PARSING" && (
-          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 flex flex-col items-center justify-center min-h-[350px] shadow-2xl relative overflow-hidden text-on-surface">
+          <div className="glass-card rounded-xl p-xl flex flex-col items-center justify-center min-h-[350px] relative overflow-hidden text-on-surface">
             <div
-              className="absolute top-0 left-0 h-1 bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-300"
+              className="absolute top-0 left-0 h-1 bg-primary transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
 
-            <Loader2 className="h-12 w-12 text-cyan-500 animate-spin mb-6" />
-            <h3 className="text-xl font-semibold mb-2">Ingesting Document</h3>
-            <p className="text-on-surface-variant text-sm mb-6">{statusText}</p>
+            <Loader2 className="h-12 w-12 text-primary animate-spin mb-lg" />
+            <h3 className="font-headline-md text-headline-md mb-sm">
+              Processing Your Book
+            </h3>
+            <p className="text-on-surface-variant font-body-md mb-lg">
+              {statusText}
+            </p>
 
-            <div className="w-full max-w-md bg-surface-container-high rounded-full h-2.5 mb-8 overflow-hidden">
+            <div className="w-full max-w-md bg-surface-container-high rounded-full h-2.5 mb-xl overflow-hidden">
               <div
-                className="bg-cyan-500 h-2.5 rounded-full transition-all duration-300"
+                className="bg-primary h-2.5 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
 
             <button
               onClick={handleAbort}
-              className="px-6 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer"
+              className="px-lg py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md border border-outline-variant/30 transition cursor-pointer"
             >
-              Cancel Import
+              Cancel
             </button>
           </div>
         )}
 
         {/* PREVIEW STATE */}
         {state === "PREVIEW" && parsedBook && (
-          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 shadow-2xl">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border-subtle">
+          <div className="glass-card rounded-xl p-xl">
+            <div className="flex items-center gap-3 mb-lg pb-sm border-b border-outline-variant/30">
               <FileText className="h-6 w-6 text-primary" />
-              <h3 className="text-xl font-semibold text-on-surface">
-                Document Preview
+              <h3 className="font-headline-md text-headline-md text-on-surface">
+                Review Your Book
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
               {/* Cover Column */}
-              <div className="md:col-span-1 flex flex-col items-center justify-center bg-surface-container-lowest/60 border border-border-subtle rounded-xl p-4 min-h-[220px]">
+              <div className="md:col-span-1 flex flex-col items-center justify-center bg-surface-container-lowest/60 border border-outline-variant/30 rounded-xl p-md min-h-[220px]">
                 {coverPreviewUrl ? (
                   <img
                     src={coverPreviewUrl}
                     alt="Cover preview"
-                    className="max-h-[180px] rounded shadow-md object-contain"
+                    className="max-h-[180px] rounded-lg border border-outline-variant/30 object-contain"
                   />
                 ) : (
-                  <div className="text-center text-zinc-500">
+                  <div className="text-center text-on-surface-variant">
                     <FileText className="h-16 w-16 mx-auto mb-3 stroke-[1]" />
-                    <span className="text-xs">No Cover Extracted</span>
+                    <span className="font-label-sm text-label-sm">
+                      No Cover Extracted
+                    </span>
                   </div>
                 )}
               </div>
 
               {/* Editing Column */}
-              <div className="md:col-span-2 space-y-4">
+              <div className="md:col-span-2 space-y-md">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                  <label className="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant mb-xs">
                     Book Title
                   </label>
                   <input
                     type="text"
                     value={editedTitle}
                     onChange={(e) => setEditedTitle(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg bg-surface-container-lowest border border-border-subtle focus:border-primary focus:ring-1 focus:ring-primary text-on-surface placeholder-zinc-600 transition outline-none"
+                    className="w-full px-md py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/30 focus:border-primary focus:ring-1 focus:ring-primary text-on-surface font-body-md placeholder-outline transition outline-none"
                     placeholder="Enter book title"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                  <label className="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant mb-xs">
                     Author
                   </label>
                   <input
                     type="text"
                     value={editedAuthor}
                     onChange={(e) => setEditedAuthor(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg bg-surface-container-lowest border border-border-subtle focus:border-primary focus:ring-1 focus:ring-primary text-on-surface placeholder-zinc-600 transition outline-none"
+                    className="w-full px-md py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/30 focus:border-primary focus:ring-1 focus:ring-primary text-on-surface font-body-md placeholder-outline transition outline-none"
                     placeholder="Enter author name"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="bg-surface-container-lowest/60 border border-border-subtle p-3 rounded-lg text-center">
-                    <div className="text-zinc-500 text-xs uppercase font-medium">
+                <div className="grid grid-cols-2 gap-md pt-xs">
+                  <div className="bg-surface-container-lowest/60 border border-outline-variant/30 p-md rounded-lg text-center">
+                    <div className="text-on-surface-variant font-label-sm text-label-sm uppercase font-medium">
                       Chapters
                     </div>
                     <div className="text-lg font-bold text-on-surface">
                       {parsedBook.chapters.length}
                     </div>
                   </div>
-                  <div className="bg-surface-container-lowest/60 border border-border-subtle p-3 rounded-lg text-center">
-                    <div className="text-zinc-500 text-xs uppercase font-medium">
+                  <div className="bg-surface-container-lowest/60 border border-outline-variant/30 p-md rounded-lg text-center">
+                    <div className="text-on-surface-variant font-label-sm text-label-sm uppercase font-medium">
                       Word Count
                     </div>
                     <div className="text-lg font-bold text-on-surface">
@@ -386,16 +461,16 @@ export default function ImportPage() {
               </div>
             </div>
 
-            <div className="flex gap-4 justify-end border-t border-zinc-800 pt-6">
+            <div className="flex gap-md justify-end border-t border-outline-variant/30 pt-lg">
               <button
                 onClick={handleCancelPreview}
-                className="px-6 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer"
+                className="px-lg py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md border border-outline-variant/30 transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmImport}
-                className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-zinc-950 font-semibold text-sm transition shadow-lg shadow-cyan-950/20"
+                className="px-lg py-2.5 rounded-lg bg-primary text-on-primary hover:brightness-110 font-semibold font-label-md text-label-md transition cursor-pointer"
               >
                 Add to Library
               </button>
@@ -405,54 +480,56 @@ export default function ImportPage() {
 
         {/* SAVING STATE */}
         {state === "SAVING" && (
-          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px] shadow-2xl text-on-surface">
-            <Loader2 className="h-12 w-12 text-emerald-500 animate-spin mb-6" />
-            <h3 className="text-xl font-semibold mb-2">Saving to Library</h3>
-            <p className="text-on-surface-variant text-sm">
-              Persisting document indices to local IndexedDB...
+          <div className="glass-card rounded-xl p-xl flex flex-col items-center justify-center min-h-[300px] text-on-surface">
+            <Loader2 className="h-12 w-12 text-primary animate-spin mb-lg" />
+            <h3 className="font-headline-md text-headline-md mb-sm">
+              Adding to Your Library
+            </h3>
+            <p className="text-on-surface-variant font-body-md">
+              Almost there...
             </p>
           </div>
         )}
 
         {/* ERROR STATE */}
         {state === "ERROR" && mappedError && (
-          <div className="backdrop-blur-md bg-surface-container-low/60 border border-border-subtle rounded-2xl p-8 shadow-2xl text-on-surface animate-in fade-in duration-200">
-            <div className="flex items-center gap-3 text-red-500 mb-6 pb-4 border-b border-border-subtle">
-              <ShieldAlert className="h-8 w-8 text-red-500 shrink-0" />
+          <div className="glass-card rounded-xl p-xl text-on-surface animate-fade-in-up">
+            <div className="flex items-center gap-3 text-error mb-lg pb-sm border-b border-outline-variant/30">
+              <ShieldAlert className="h-8 w-8 text-error shrink-0" />
               <div>
-                <h3 className="text-xl font-bold text-on-surface">
+                <h3 className="font-headline-md text-headline-md text-on-surface">
                   {mappedError.title}
                 </h3>
-                <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold font-mono block mt-0.5">
+                <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold block mt-0.5">
                   Error Code: {errorType}
                 </span>
               </div>
             </div>
 
-            <div className="bg-surface-container border border-border-subtle rounded-xl p-6 mb-8">
-              <p className="text-base text-on-surface leading-relaxed">
+            <div className="bg-surface-container border border-outline-variant/30 rounded-xl p-lg mb-xl">
+              <p className="font-body-md text-body-md text-on-surface leading-relaxed">
                 {mappedError.description}
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-end border-t border-border-subtle pt-6">
+            <div className="flex flex-col sm:flex-row gap-sm justify-end border-t border-outline-variant/30 pt-lg">
               <button
                 onClick={() => {
                   setMappedError(null);
                   setState("IDLE");
                   router.push("/");
                 }}
-                className="px-6 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer flex items-center justify-center gap-1.5"
+                className="px-lg py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md border border-outline-variant/30 transition cursor-pointer flex items-center justify-center gap-1.5"
               >
                 Return to Dashboard
               </button>
-              
+
               <button
                 onClick={() => {
                   setMappedError(null);
                   setState("IDLE");
                 }}
-                className="px-6 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-medium border border-border-subtle transition cursor-pointer flex items-center justify-center gap-1.5"
+                className="px-lg py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md border border-outline-variant/30 transition cursor-pointer flex items-center justify-center gap-1.5"
               >
                 Try Again
               </button>
@@ -465,7 +542,7 @@ export default function ImportPage() {
                     fileInputRef.current.click();
                   }
                 }}
-                className="px-6 py-2.5 rounded-lg bg-primary text-on-primary hover:brightness-110 font-bold text-sm transition cursor-pointer flex items-center justify-center gap-1.5"
+                className="px-lg py-2.5 rounded-lg bg-primary text-on-primary hover:brightness-110 font-bold font-label-md text-label-md transition cursor-pointer flex items-center justify-center gap-1.5"
               >
                 Choose Another File
               </button>

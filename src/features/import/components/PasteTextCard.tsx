@@ -39,19 +39,19 @@ export const PasteTextCard: React.FC<PasteTextCardProps> = ({
 
   return (
     <Card
-      className="bg-surface-container-lowest border border-border-subtle rounded-xl p-space-lg"
+      className="bg-surface-container-low border border-outline-variant/30 rounded-xl p-lg"
       id="paste-section"
     >
-      <div className="flex items-center justify-between mb-space-md">
-        <label className="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">
+      <div className="flex items-center justify-between mb-md">
+        <label className="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">
           Quick Paste &amp; Read
         </label>
-        <span className="text-xs text-outline font-label-mono">
+        <span className="font-label-sm text-label-sm text-on-surface-variant">
           {text.length.toLocaleString()} characters
         </span>
       </div>
       <textarea
-        className="w-full min-h-[320px] bg-transparent border-none focus:ring-0 font-body-md text-on-surface resize-none custom-scrollbar p-0 outline-none"
+        className="w-full min-h-[320px] bg-surface-container-lowest border border-outline-variant/30 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md text-on-surface resize-none custom-scrollbar p-md outline-none transition-colors"
         placeholder="Paste your text content here..."
         value={text}
         onChange={(e) => {
@@ -61,24 +61,24 @@ export const PasteTextCard: React.FC<PasteTextCardProps> = ({
       ></textarea>
 
       {errorMsg && (
-        <div className="text-red-500 text-xs mt-2 font-semibold">
+        <div className="text-error font-label-sm text-label-sm mt-sm font-semibold">
           {errorMsg}
         </div>
       )}
 
-      <div className="mt-space-lg flex justify-end gap-space-md border-t border-border-subtle pt-space-md">
+      <div className="mt-lg flex justify-end gap-md border-t border-outline-variant/30 pt-md">
         <button
           onClick={() => {
             setText("");
             setErrorMsg("");
           }}
-          className="px-space-lg py-2 rounded-lg font-label-mono text-label-mono text-outline hover:text-on-surface transition-colors"
+          className="px-lg py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors"
         >
           Clear
         </button>
         <button
           onClick={handlePasteClipboard}
-          className="px-space-lg py-2 rounded-lg font-label-mono text-label-mono text-primary hover:text-primary-variant transition-colors"
+          className="px-lg py-2 rounded-lg font-label-md text-label-md text-primary hover:text-primary-fixed-dim transition-colors"
           id="paste-clipboard-btn"
         >
           Paste Clipboard

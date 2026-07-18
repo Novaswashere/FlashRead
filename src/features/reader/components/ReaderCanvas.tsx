@@ -18,15 +18,15 @@ export const ReaderCanvas: React.FC<ReaderCanvasProps> = ({
     <div
       onClick={onCanvasClick}
       className={cn(
-        "max-w-reader-width w-full h-96 flex flex-col items-center justify-center relative cursor-pointer",
+        "max-w-reader-width w-full h-96 flex items-center justify-center relative cursor-pointer overflow-hidden",
         className
       )}
     >
-      {/* Focus Crosshairs Guides */}
+      {/* Center guide hairline - ORP alignment point */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-        <div className="w-full h-px bg-border-subtle opacity-30"></div>
+        <div className="w-full h-px bg-border-subtle opacity-20"></div>
         {orpEnabled && (
-          <div className="orp-marker absolute h-full flex items-center justify-center"></div>
+          <div className="absolute w-0.5 h-12 bg-primary/30 rounded-full"></div>
         )}
       </div>
       {children}

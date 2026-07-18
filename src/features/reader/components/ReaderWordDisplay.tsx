@@ -27,18 +27,27 @@ export const ReaderWordDisplay: React.FC<ReaderWordDisplayProps> = ({
     fontSize: `${fontSize}px`,
   };
 
+  const showMarker = orpEnabled && word.length > 0;
+
   return (
-    <div className="relative z-10 select-none" style={fontStyle}>
-      <div className="flex tracking-tight justify-center items-center">
-        <span className="text-on-surface">{prefix}</span>
+    <div
+      className={`relative z-10 select-none ${showMarker ? "orp-marker" : ""}`}
+      style={fontStyle}
+    >
+      <div className="flex tracking-tight items-center justify-center">
+        <span className="text-on-surface-variant text-right">
+          {prefix}
+        </span>
         {orpEnabled ? (
-          <span className="text-primary font-bold drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] dark:drop-shadow-[0_0_12px_rgba(6,182,212,1)] transition-all duration-75">
+          <span className="text-primary font-bold drop-shadow-[0_0_12px_var(--primary)] transition-all duration-75 px-[1px]">
             {orpChar}
           </span>
         ) : (
-          <span className="text-on-surface">{orpChar}</span>
+          <span className="text-on-surface px-[1px]">{orpChar}</span>
         )}
-        <span className="text-on-surface">{suffix}</span>
+        <span className="text-on-surface-variant text-left">
+          {suffix}
+        </span>
       </div>
     </div>
   );

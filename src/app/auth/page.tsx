@@ -18,7 +18,7 @@ export default function AuthPage() {
     <main className="pt-24 pb-20 md:pb-8 md:pl-72 px-space-md max-w-container-max mx-auto min-h-screen flex items-center justify-center">
       <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-space-lg w-full max-w-md shadow-sm">
         <h2 className="font-headline-md text-headline-md font-bold text-primary mb-2 text-center">
-          Welcome to FlashRead
+          Welcome to ReadPilot
         </h2>
         <p className="text-on-surface-variant text-center mb-space-lg">
           Focus your mind. Speed read your documents.

@@ -10,7 +10,7 @@ import { NavigationDrawer } from "@/components/layout/NavigationDrawer";
 import { BottomNavBar } from "@/components/layout/BottomNavBar";
 
 export const metadata = {
-  title: "FlashRead - Focus Your Mind",
+  title: "ReadPilot - Focus Your Mind",
   description:
     "A professional e-reader app optimized for rapid serial visual presentation reading.",
 };

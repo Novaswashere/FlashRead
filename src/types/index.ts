@@ -28,4 +28,5 @@ export interface Settings {
   readingMode: "rsvp" | "traditional";
   reducedMotion: boolean;
   screenReaderOptimized: boolean;
+  readingAnchorEnabled: boolean;
 }

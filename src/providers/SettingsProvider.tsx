@@ -18,6 +18,7 @@ const defaultSettings: Settings = {
   readingMode: "rsvp",
   reducedMotion: false,
   screenReaderOptimized: false,
+  readingAnchorEnabled: true,
 };
 
 const SettingsContext = createContext<SettingsContextProps | undefined>(
@@ -30,7 +31,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [settings, setSettings] = useState<Settings>(defaultSettings);
 
   useEffect(() => {
-    const saved = localStorage.getItem("flashread_settings");
+    const saved = localStorage.getItem("readpilot_settings");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -44,7 +45,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateSettings = (newSettings: Partial<Settings>) => {
     setSettings((prev) => {
       const updated = { ...prev, ...newSettings };
-      localStorage.setItem("flashread_settings", JSON.stringify(updated));
+      localStorage.setItem("readpilot_settings", JSON.stringify(updated));
       return updated;
     });
   };

@@ -24,7 +24,7 @@ export default function SettingsPage() {
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("flashread_settings_visited", "true");
+      localStorage.setItem("readpilot_settings_visited", "true");
     }
   }, []);
 
@@ -49,10 +49,10 @@ export default function SettingsPage() {
     <main className="md:ml-64 pt-24 pb-32 px-space-md md:px-space-xl min-h-screen max-w-reader-width mx-auto text-left relative">
       <div className="mb-space-xl">
         <h2 className="font-headline-lg text-headline-lg text-on-surface">
-          Settings
+          Preferences
         </h2>
         <p className="text-on-surface-variant mt-2">
-          Configure your personalized rapid reading environment.
+          Customize your reading experience to match your comfort and style.
         </p>
       </div>
 
@@ -60,16 +60,18 @@ export default function SettingsPage() {
         {/* Reading Experience */}
         <section>
           <h3 className="font-label-mono text-label-mono text-primary uppercase tracking-wider mb-space-sm">
-            Reading Experience
+            Speed & Focus
           </h3>
           <div className="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden divide-y divide-border-subtle">
             <ReaderSection
               defaultWpm={draftSettings.defaultWPM}
               orpEnabled={draftSettings.orpEnabled}
               smartPauseEnabled={draftSettings.smartPauseEnabled}
+              readingAnchorEnabled={draftSettings.readingAnchorEnabled ?? false}
               onWpmChange={(wpm) => handleDraftChange({ defaultWPM: wpm })}
               onOrpChange={(orp) => handleDraftChange({ orpEnabled: orp })}
               onSmartPauseChange={(smartPause) => handleDraftChange({ smartPauseEnabled: smartPause })}
+              onReadingAnchorChange={(anchor) => handleDraftChange({ readingAnchorEnabled: anchor })}
             />
           </div>
         </section>
@@ -122,7 +124,7 @@ export default function SettingsPage() {
 
         <div className="pt-space-xl pb-space-lg text-center">
           <p className="text-xs text-outline font-label-mono">
-            FlashRead v2.4.0 • Build 829
+            ReadPilot v1.0.0 • Build 1
           </p>
         </div>
       </div>
@@ -132,8 +134,8 @@ export default function SettingsPage() {
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl animate-in slide-in-from-bottom-4 duration-200">
           <div className="bg-surface-container-high/90 dark:bg-surface-container-high/95 backdrop-blur-md border border-border-subtle rounded-2xl p-4 shadow-2xl flex items-center justify-between gap-4">
             <div className="text-left">
-              <p className="font-bold text-on-surface text-sm">Unsaved Changes</p>
-              <p className="text-xs text-on-surface-variant">You have configured updates that aren&apos;t saved yet.</p>
+              <p className="font-bold text-on-surface text-sm">Changes Not Saved</p>
+              <p className="text-xs text-on-surface-variant">You&apos;ve made changes that haven&apos;t been saved yet.</p>
             </div>
             <div className="flex gap-2 shrink-0">
               <button

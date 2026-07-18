@@ -18,7 +18,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     // 1. Try to read theme from settings first to prevent out-of-sync settings
-    const savedSettings = localStorage.getItem("flashread_settings");
+    const savedSettings = localStorage.getItem("readpilot_settings");
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
@@ -38,7 +38,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     // 2. Fallback to standalone theme
-    const saved = localStorage.getItem("flashread_theme") as Theme;
+    const saved = localStorage.getItem("readpilot_theme") as Theme;
     if (
       saved === "light" ||
       saved === "dark" ||
@@ -51,7 +51,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem("flashread_theme", newTheme);
+    localStorage.setItem("readpilot_theme", newTheme);
   };
 
   useEffect(() => {
